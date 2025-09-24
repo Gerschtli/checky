@@ -1,0 +1,74 @@
+name: CI/CD
+on:
+  push:
+  schedule:
+    - cron: 0 0 * * 1
+  workflow_dispatch:
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: nix develop --command bash -eo pipefail {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build dev shell
+        shell: bash
+        run: nix develop --profile profile && rm profile
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Prepare .env
+        run: cp .env.example .env
+
+      - run: pnpm install
+
+      - run: pnpm run lint
+
+      - run: pnpm run check
+
+  nix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+
+      - name: Restore and save Nix store
+        uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}
+
+      - run: nix flake check --print-build-logs
