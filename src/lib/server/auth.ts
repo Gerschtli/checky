@@ -1,7 +1,8 @@
-import type { RequestEvent } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import type { RequestEvent } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
+
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 
@@ -20,7 +21,7 @@ export async function createSession(token: string, userId: string) {
 	const session: table.Session = {
 		id: sessionId,
 		userId,
-		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
+		expiresAt: new Date(Date.now() + DAY_IN_MS * 30),
 	};
 	await db.insert(table.session).values(session);
 	return session;
@@ -32,7 +33,7 @@ export async function validateSessionToken(token: string) {
 		.select({
 			// Adjust user table here to tweak returned data
 			user: { id: table.user.id, username: table.user.username },
-			session: table.session
+			session: table.session,
 		})
 		.from(table.session)
 		.innerJoin(table.user, eq(table.session.userId, table.user.id))
@@ -70,12 +71,12 @@ export async function invalidateSession(sessionId: string) {
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
 	event.cookies.set(sessionCookieName, token, {
 		expires: expiresAt,
-		path: '/'
+		path: '/',
 	});
 }
 
 export function deleteSessionTokenCookie(event: RequestEvent) {
 	event.cookies.delete(sessionCookieName, {
-		path: '/'
+		path: '/',
 	});
 }

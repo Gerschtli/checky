@@ -1,9 +1,18 @@
 {
 	"useTabs": true,
+	"tabWidth": 4,
 	"singleQuote": true,
-	"trailingComma": "none",
+	"trailingComma": "all",
 	"printWidth": 100,
-	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+	"htmlWhitespaceSensitivity": "ignore",
+	"plugins": [
+		"prettier-plugin-svelte",
+		"prettier-plugin-tailwindcss",
+		"@trivago/prettier-plugin-sort-imports"
+	],
+	"importOrder": ["^\\$(app|env)/", "^\\$lib/server", "^\\$", "^\\.\\./", "^\\./", "\\.css$"],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true,
 	"overrides": [
 		{
 			"files": "*.svelte",
