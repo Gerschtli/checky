@@ -21,7 +21,7 @@
 			aria-errormessage="{editTask.field('title')}-error"
 		/>
 		{#if editTask.issues?.title}
-			{#each editTask.issues.title as issue}
+			{#each editTask.issues.title as issue, i (i)}
 				<small id="{editTask.field('title')}-error">{issue.message}</small>
 			{/each}
 		{/if}
@@ -38,7 +38,7 @@
 			aria-errormessage="{editTask.field('nextDueDate')}-error"
 		/>
 		{#if editTask.issues?.nextDueDate}
-			{#each editTask.issues.nextDueDate as issue}
+			{#each editTask.issues.nextDueDate as issue, i (i)}
 				<small id="{editTask.field('nextDueDate')}-error">{issue.message}</small>
 			{/each}
 		{/if}
@@ -55,7 +55,7 @@
 			aria-errormessage="{editTask.field('intervalDays')}-error"
 		/>
 		{#if editTask.issues?.intervalDays}
-			{#each editTask.issues.intervalDays as issue}
+			{#each editTask.issues.intervalDays as issue, i (i)}
 				<small id="{editTask.field('intervalDays')}-error">{issue.message}</small>
 			{/each}
 		{/if}
@@ -74,7 +74,7 @@
 			<option value="fromDueDate">fromDueDate</option>
 		</select>
 		{#if editTask.issues?.repeatMode}
-			{#each editTask.issues.repeatMode as issue}
+			{#each editTask.issues.repeatMode as issue, i (i)}
 				<small id="{editTask.field('repeatMode')}-error">{issue.message}</small>
 			{/each}
 		{/if}
