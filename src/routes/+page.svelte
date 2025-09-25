@@ -1,90 +1,45 @@
 <script lang="ts">
-	import { getUser } from '$lib/auth.remote';
-	import { createTask, getAllTasks } from '$lib/task.remote';
+	import { Archive, Check, Pause, Pencil, Plus } from 'lucide-svelte';
 
-	const user = await getUser();
+	import { resolve } from '$app/paths';
+
+	import { convertDateToIsoString, formatDate } from '$lib/dates';
+	import { archiveTask, completeTask, getAllTasks } from '$lib/task.remote';
 </script>
 
-<h1>Hi, {user.username}!</h1>
-<p>Your user ID is {user.id}.</p>
+<a role="button" href={resolve('/create')} title="Aufgabe erstellen"><Plus size={16} /></a>
 
-<h2>All tasks</h2>
+{#each await getAllTasks() as task (task.id)}
+	<article>
+		<header>{task.title}</header>
+		<div class="grid text-xs">
+			<span>{formatDate(task.nextDueDate)}</span>
+			<span>Alle {task.intervalDays} Tag(e)</span>
+			<span>{task.repeatMode}</span>
+		</div>
+		<footer class="flex gap-4">
+			<a
+				role="button"
+				href={resolve('/edit/[id]', { id: `${task.id}` })}
+				title="Aufgabe bearbeiten"
+			>
+				<Pencil size={16} />
+			</a>
+			<form {...completeTask}>
+				<input type="hidden" name="id" value={task.id} />
+				<input
+					type="hidden"
+					name="completionDate"
+					value={convertDateToIsoString(new Date())}
+				/>
+				<button><Check size={16} /></button>
+			</form>
 
-<ul>
-	{#each await getAllTasks() as task}
-		<li>
-			<pre>{JSON.stringify(task, null, 2)}</pre>
-		</li>
-	{/each}
-</ul>
-
-<h2>Create task</h2>
-
-<form {...createTask} oninput={() => createTask.validate()}>
-	<div>
-		<label for={createTask.field('title')}>Title</label>
-		<input
-			type="text"
-			id={createTask.field('title')}
-			name={createTask.field('title')}
-			aria-invalid={createTask.issues?.title ? true : undefined}
-			aria-errormessage="{createTask.field('title')}-error"
-		/>
-		{#if createTask.issues?.title}
-			{#each createTask.issues.title as issue}
-				<small id="{createTask.field('title')}-error">{issue.message}</small>
-			{/each}
-		{/if}
-	</div>
-
-	<div>
-		<label for={createTask.field('nextDueDate')}>nextDueDate</label>
-		<input
-			type="date"
-			id={createTask.field('nextDueDate')}
-			name={createTask.field('nextDueDate')}
-			aria-invalid={createTask.issues?.nextDueDate ? true : undefined}
-			aria-errormessage="{createTask.field('nextDueDate')}-error"
-		/>
-		{#if createTask.issues?.nextDueDate}
-			{#each createTask.issues.nextDueDate as issue}
-				<small id="{createTask.field('nextDueDate')}-error">{issue.message}</small>
-			{/each}
-		{/if}
-	</div>
-
-	<div>
-		<label for={createTask.field('intervalDays')}>intervalDays</label>
-		<input
-			type="number"
-			id={createTask.field('intervalDays')}
-			name={createTask.field('intervalDays')}
-			aria-invalid={createTask.issues?.intervalDays ? true : undefined}
-			aria-errormessage="{createTask.field('intervalDays')}-error"
-		/>
-		{#if createTask.issues?.intervalDays}
-			{#each createTask.issues.intervalDays as issue}
-				<small id="{createTask.field('intervalDays')}-error">{issue.message}</small>
-			{/each}
-		{/if}
-	</div>
-
-	<div>
-		<label for={createTask.field('repeatMode')}>repeatMode</label>
-		<select
-			id={createTask.field('repeatMode')}
-			name={createTask.field('repeatMode')}
-			aria-invalid={createTask.issues?.repeatMode ? true : undefined}
-			aria-errormessage="{createTask.field('repeatMode')}-error"
-		>
-			<option value="fromDueDate">fromDueDate</option>
-			<option value="fromCompletionDate">fromCompletionDate</option>
-		</select>
-		{#if createTask.issues?.repeatMode}
-			{#each createTask.issues.repeatMode as issue}
-				<small id="{createTask.field('repeatMode')}-error">{issue.message}</small>
-			{/each}
-		{/if}
-	</div>
-	<button>Create task</button>
-</form>
+			<form {...archiveTask}>
+				<input type="hidden" name="id" value={task.id} />
+				<button><Archive size={16} /></button>
+			</form>
+			<button><Pause size={16} /></button>
+		</footer>
+	</article>
+{/each}

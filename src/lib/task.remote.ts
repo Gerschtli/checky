@@ -1,35 +1,120 @@
+import { error, redirect } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 import { form, query } from '$app/server';
 
-import { db } from './server/db';
-import { task } from './server/db/schema';
+import * as table from '$lib/server/db/schema';
 
-const isoDateToDate = z.codec(z.iso.date(), z.date(), {
-	decode: (isoString) => new Date(isoString),
-	encode: (date) => date.toISOString(),
-});
+import { addToDate } from './dates';
+import { db } from './server/db';
 
 export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
-		nextDueDate: isoDateToDate,
+		nextDueDate: z.iso.date(),
 		intervalDays: z.coerce.number<string>().int().min(1),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
-		console.log(data);
-		await db.insert(task).values({
+		await db.insert(table.task).values({
 			title: data.title,
 			nextDueDate: data.nextDueDate,
 			intervalDays: data.intervalDays,
 			repeatMode: data.repeatMode,
+			archived: false,
 		});
 
+		await getAllTasks().refresh();
+
+		redirect(303, '/');
+	},
+);
+
+export const editTask = form(
+	z.object({
+		id: z.coerce.number<string>().int(),
+		title: z.string().trim().min(1),
+		nextDueDate: z.iso.date(),
+		intervalDays: z.coerce.number<string>().int().min(1),
+		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
+	}),
+	async (data) => {
+		await db
+			.update(table.task)
+			.set({
+				title: data.title,
+				nextDueDate: data.nextDueDate,
+				intervalDays: data.intervalDays,
+				repeatMode: data.repeatMode,
+			})
+			.where(eq(table.task.id, data.id));
+
+		await getTaskById(data.id).refresh();
+		await getAllTasks().refresh();
+
+		redirect(303, '/');
+	},
+);
+
+export const completeTask = form(
+	z.object({
+		id: z.coerce.number<string>().int(),
+		completionDate: z.iso.date(),
+	}),
+	async (data) => {
+		const task = await getTaskById(data.id);
+
+		if (task.archived) error(400);
+
+		await db.insert(table.taskCompleted).values({
+			taskId: task.id,
+			completionDate: data.completionDate,
+		});
+
+		await db
+			.update(table.task)
+			.set({
+				nextDueDate: addToDate(
+					task.repeatMode === 'fromCompletionDate'
+						? data.completionDate
+						: task.nextDueDate,
+					task.intervalDays,
+				),
+			})
+			.where(eq(table.task.id, data.id));
+
+		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
 	},
 );
 
+export const archiveTask = form(
+	z.object({
+		id: z.coerce.number<string>().int(),
+	}),
+	async (data) => {
+		await db
+			.update(table.task)
+			.set({
+				archived: true,
+				archived_at: new Date(),
+			})
+			.where(eq(table.task.id, data.id));
+
+		await getTaskById(data.id).refresh();
+		await getAllTasks().refresh();
+	},
+);
+
+export const getTaskById = query(z.int(), async (id) => {
+	const result = await db.select().from(table.task).where(eq(table.task.id, id));
+
+	if (result.length === 0) error(404);
+
+	return result[0];
+});
+
 export const getAllTasks = query(async () => {
-	return await db.select().from(task);
+	return await db.select().from(table.task).where(eq(table.task.archived, false));
 });
