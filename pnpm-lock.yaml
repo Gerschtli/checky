@@ -14,6 +14,9 @@ importers:
       better-sqlite3:
         specifier: ^12.4.1
         version: 12.4.1
+      lucide-svelte:
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.39.6)
       zod:
         specifier: ^4.1.11
         version: 4.1.11
@@ -1642,6 +1645,11 @@ packages:
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
+  lucide-svelte@0.544.0:
+    resolution: {integrity: sha512-8kBxSivf8SJdEUJRHBpu9bRw0S/qfVK+Yfb92KQnRRBdP425RzT6aQfrIfZctG1oucPVTBQe1ZXgmth/3qVICg==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   magic-string@0.30.19:
     resolution: {integrity: sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw==}
@@ -3443,6 +3451,10 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lodash@4.17.21: {}
+
+  lucide-svelte@0.544.0(svelte@5.39.6):
+    dependencies:
+      svelte: 5.39.6
 
   magic-string@0.30.19:
     dependencies:
