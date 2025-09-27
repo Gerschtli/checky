@@ -6,14 +6,16 @@
 	const task = await getTaskById(parseInt(page.params.id!));
 </script>
 
-<h2>Edit task {task.id}</h2>
+<h1 class="text-xl font-bold">Aufgabe bearbeiten</h1>
 
-<form {...editTask} oninput={() => editTask.validate()}>
+<form {...editTask} oninput={() => editTask.validate()} class="flex flex-col gap-2">
 	<input type="hidden" name="id" value={task.id} />
-	<div>
-		<label for={editTask.field('title')}>Title</label>
+
+	<div class="flex flex-col">
+		<label class="label" for={editTask.field('title')}>Titel</label>
 		<input
 			type="text"
+			class="input w-full"
 			id={editTask.field('title')}
 			name={editTask.field('title')}
 			value={task.title}
@@ -22,15 +24,18 @@
 		/>
 		{#if editTask.issues?.title}
 			{#each editTask.issues.title as issue, i (i)}
-				<small id="{editTask.field('title')}-error">{issue.message}</small>
+				<small class="text-error" id="{editTask.field('title')}-error">
+					{issue.message}
+				</small>
 			{/each}
 		{/if}
 	</div>
 
-	<div>
-		<label for={editTask.field('nextDueDate')}>nextDueDate</label>
+	<div class="flex flex-col">
+		<label class="label" for={editTask.field('nextDueDate')}>Nächstes Fälligkeitsdatum</label>
 		<input
 			type="date"
+			class="input w-full"
 			id={editTask.field('nextDueDate')}
 			name={editTask.field('nextDueDate')}
 			value={task.nextDueDate}
@@ -39,15 +44,20 @@
 		/>
 		{#if editTask.issues?.nextDueDate}
 			{#each editTask.issues.nextDueDate as issue, i (i)}
-				<small id="{editTask.field('nextDueDate')}-error">{issue.message}</small>
+				<small class="text-error" id="{editTask.field('nextDueDate')}-error">
+					{issue.message}
+				</small>
 			{/each}
 		{/if}
 	</div>
 
-	<div>
-		<label for={editTask.field('intervalDays')}>intervalDays</label>
+	<div class="flex flex-col">
+		<label class="label" for={editTask.field('intervalDays')}>
+			Wiederholungsintervall in Tagen
+		</label>
 		<input
 			type="number"
+			class="input w-full"
 			id={editTask.field('intervalDays')}
 			name={editTask.field('intervalDays')}
 			value={task.intervalDays}
@@ -56,28 +66,34 @@
 		/>
 		{#if editTask.issues?.intervalDays}
 			{#each editTask.issues.intervalDays as issue, i (i)}
-				<small id="{editTask.field('intervalDays')}-error">{issue.message}</small>
+				<small class="text-error" id="{editTask.field('intervalDays')}-error">
+					{issue.message}
+				</small>
 			{/each}
 		{/if}
 	</div>
 
-	<div>
-		<label for={editTask.field('repeatMode')}>repeatMode</label>
+	<div class="flex flex-col">
+		<label class="label" for={editTask.field('repeatMode')}>Wiederholungsmodus</label>
 		<select
+			class="w-full select"
 			id={editTask.field('repeatMode')}
 			name={editTask.field('repeatMode')}
 			value={task.repeatMode}
 			aria-invalid={editTask.issues?.repeatMode ? true : undefined}
 			aria-errormessage="{editTask.field('repeatMode')}-error"
 		>
-			<option value="fromCompletionDate">fromCompletionDate</option>
-			<option value="fromDueDate">fromDueDate</option>
+			<option value="fromCompletionDate">Wiederholung ab Erledigungsdatum</option>
+			<option value="fromDueDate">Wiederholung ab Fälligkeitsdatum</option>
 		</select>
 		{#if editTask.issues?.repeatMode}
 			{#each editTask.issues.repeatMode as issue, i (i)}
-				<small id="{editTask.field('repeatMode')}-error">{issue.message}</small>
+				<small class="text-error" id="{editTask.field('repeatMode')}-error">
+					{issue.message}
+				</small>
 			{/each}
 		{/if}
 	</div>
-	<button>Edit task</button>
+
+	<button class="btn btn-primary">Speichern</button>
 </form>
