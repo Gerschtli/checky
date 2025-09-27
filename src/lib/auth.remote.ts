@@ -46,7 +46,10 @@ export const login = form(
 		_password: z.string().min(6),
 	}),
 	async ({ username, _password: password }) => {
-		const results = await db.select().from(table.user).where(eq(table.user.username, username));
+		const results = await db
+			.select()
+			.from(table.users)
+			.where(eq(table.users.username, username));
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
@@ -79,7 +82,7 @@ export const register = form(
 		const passwordHash = hash(password);
 
 		try {
-			await db.insert(table.user).values({ id: userId, username, passwordHash });
+			await db.insert(table.users).values({ id: userId, username, passwordHash });
 
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);

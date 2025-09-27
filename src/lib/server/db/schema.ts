@@ -17,21 +17,21 @@ const customDate = customType<{ data: LocalDate }>({
 	},
 });
 
-export const user = sqliteTable('user', {
+export const users = sqliteTable('users', {
 	id: text().primaryKey(),
 	username: text().notNull().unique(),
 	passwordHash: text().notNull(),
 });
 
-export const session = sqliteTable('session', {
+export const sessions = sqliteTable('sessions', {
 	id: text().primaryKey(),
 	userId: text()
 		.notNull()
-		.references(() => user.id),
+		.references(() => users.id),
 	expiresAt: integer({ mode: 'timestamp' }).notNull(),
 });
 
-export const task = sqliteTable('task', {
+export const tasks = sqliteTable('tasks', {
 	id: integer().primaryKey({ autoIncrement: true }),
 	title: text().notNull(),
 	nextDueDate: customDate().notNull(),
@@ -47,14 +47,14 @@ export const task = sqliteTable('task', {
 	archivedAt: integer({ mode: 'timestamp' }),
 });
 
-export const taskCompleted = sqliteTable('task_completed', {
+export const tasksCompleted = sqliteTable('tasks_completed', {
 	id: integer().primaryKey({ autoIncrement: true }),
 	taskId: integer()
 		.notNull()
-		.references(() => task.id),
+		.references(() => tasks.id),
 	completionDate: customDate().notNull(),
 });
 
-export type Session = typeof session.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
 
-export type User = typeof user.$inferSelect;
+export type User = typeof users.$inferSelect;

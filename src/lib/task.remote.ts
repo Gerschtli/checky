@@ -17,7 +17,7 @@ export const createTask = form(
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
-		await db.insert(table.task).values({
+		await db.insert(table.tasks).values({
 			title: data.title,
 			nextDueDate: data.nextDueDate,
 			intervalDays: data.intervalDays,
@@ -41,14 +41,14 @@ export const editTask = form(
 	}),
 	async (data) => {
 		await db
-			.update(table.task)
+			.update(table.tasks)
 			.set({
 				title: data.title,
 				nextDueDate: data.nextDueDate,
 				intervalDays: data.intervalDays,
 				repeatMode: data.repeatMode,
 			})
-			.where(eq(table.task.id, data.id));
+			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -67,20 +67,20 @@ export const completeTask = form(
 
 		if (task.archived) error(400);
 
-		await db.insert(table.taskCompleted).values({
+		await db.insert(table.tasksCompleted).values({
 			taskId: task.id,
 			completionDate: data.completionDate,
 		});
 
 		await db
-			.update(table.task)
+			.update(table.tasks)
 			.set({
 				nextDueDate: (task.repeatMode === 'fromCompletionDate'
 					? data.completionDate
 					: task.nextDueDate
 				).addDays(task.intervalDays),
 			})
-			.where(eq(table.task.id, data.id));
+			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -93,12 +93,12 @@ export const archiveTask = form(
 	}),
 	async (data) => {
 		await db
-			.update(table.task)
+			.update(table.tasks)
 			.set({
 				archived: true,
 				archivedAt: new Date(),
 			})
-			.where(eq(table.task.id, data.id));
+			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -114,11 +114,11 @@ export const pauseTask = form(
 		const task = await getTaskById(data.id);
 
 		await db
-			.update(table.task)
+			.update(table.tasks)
 			.set({
 				nextDueDate: task.nextDueDate.addDays(data.countDays),
 			})
-			.where(eq(table.task.id, data.id));
+			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -126,7 +126,7 @@ export const pauseTask = form(
 );
 
 export const getTaskById = query(z.int(), async (id) => {
-	const result = await db.select().from(table.task).where(eq(table.task.id, id));
+	const result = await db.select().from(table.tasks).where(eq(table.tasks.id, id));
 
 	if (result.length === 0) error(404);
 
@@ -136,9 +136,9 @@ export const getTaskById = query(z.int(), async (id) => {
 export const getAllTasks = query(async () => {
 	const tasks = await db
 		.select()
-		.from(table.task)
-		.where(eq(table.task.archived, false))
-		.orderBy(table.task.nextDueDate);
+		.from(table.tasks)
+		.where(eq(table.tasks.archived, false))
+		.orderBy(table.tasks.nextDueDate);
 
 	return tasks.map((t) => ({ ...t, completed: false }));
 });
