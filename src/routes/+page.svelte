@@ -100,6 +100,8 @@
 								Überfällig seit {Math.abs(dueInDays)}&nbsp;Tagen
 							{:else if dueInDays === 0}
 								Heute fällig
+							{:else if dueInDays === 1}
+								Morgen fällig
 							{:else if dueInDays > 0}
 								Fällig in {dueInDays}&nbsp;Tagen
 							{/if}
