@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { customType, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-import { LocalDate } from '$lib/dates';
+import { LocalDate } from '../../dates';
 
 const customDate = customType<{ data: LocalDate }>({
 	dataType() {
