@@ -10,7 +10,7 @@
 
 	import '../app.css';
 
-	const user = await getUserOptional();
+	const user = $derived(await getUserOptional());
 
 	let { children } = $props();
 
