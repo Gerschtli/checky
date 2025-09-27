@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Archive, CircleCheck, CirclePause, EllipsisVertical, Pencil } from 'lucide-svelte';
 
+	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';
 
 	import TaskInfo from '$lib/TaskInfo.svelte';
+	import { initData } from '$lib/init.remote';
 	import {
 		archiveTask,
 		completeTask,
@@ -22,6 +24,10 @@
 		}
 	}
 </script>
+
+{#if dev}
+	<button class="btn btn-warning mb-4" onclick={() => initData()}>Testdaten generieren</button>
+{/if}
 
 {#if tasks.length === 0}
 	<div class="flex flex-col items-center py-8">
