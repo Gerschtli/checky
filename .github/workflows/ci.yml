@@ -53,6 +53,8 @@ jobs:
 
       - run: pnpm run check
 
+      - run: pnpm run test
+
   nix:
     runs-on: ubuntu-latest
 
