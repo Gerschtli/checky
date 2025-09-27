@@ -87,10 +87,7 @@ export const completeTask = command(
 		await db
 			.update(table.tasks)
 			.set({
-				nextDueDate: (task.repeatMode === 'fromCompletionDate'
-					? completionDate
-					: task.nextDueDate
-				).addDays(task.intervalDays),
+				nextDueDate: calculateNextDueDate(task, completionDate),
 			})
 			.where(eq(table.tasks.id, data.id));
 
@@ -98,6 +95,25 @@ export const completeTask = command(
 		await getAllTasks().refresh();
 	},
 );
+
+function calculateNextDueDate(
+	task: {
+		nextDueDate: LocalDate;
+		intervalDays: number;
+		repeatMode: 'fromDueDate' | 'fromCompletionDate';
+	},
+	completionDate: LocalDate,
+) {
+	if (task.repeatMode === 'fromCompletionDate') {
+		return completionDate.addDays(task.intervalDays);
+	}
+
+	const candidate = task.nextDueDate.addDays(task.intervalDays);
+
+	if (completionDate.diffDays(candidate) > 0) return completionDate.addDays(1);
+
+	return candidate;
+}
 
 export const uncompleteTask = command(
 	z.object({
