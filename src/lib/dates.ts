@@ -1,16 +1,76 @@
-export function addToDate(inputDate: string, addDays: number) {
-	const date = new Date(inputDate);
-	date.setDate(date.getDate() + addDays);
+export class LocalDate {
+	#date: Date;
 
-	return convertDateToIsoString(date);
-}
+	private constructor(date: Date) {
+		this.#date = date;
+	}
 
-export function convertDateToIsoString(date: Date) {
-	return date.toISOString().split('T')[0];
-}
+	static of(iso: string) {
+		return new LocalDate(new Date(iso));
+	}
 
-export function formatDate(date: string) {
-	return new Date(date).toLocaleDateString('de-DE', {
-		dateStyle: 'medium',
-	});
+	static now() {
+		const today = new Date();
+		// Zeitzonen-Offset anpassen, um das korrekte lokale Datum zu erhalten
+		today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+
+		return new LocalDate(today);
+	}
+
+	addDays(numberOfDays: number) {
+		const newDate = new Date(this.#date);
+		newDate.setDate(newDate.getDate() + numberOfDays);
+
+		return new LocalDate(newDate);
+	}
+
+	diffDays(localDate: LocalDate) {
+		const diffTime = this.#date.getTime() - localDate.#date.getTime();
+		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+		return diffDays;
+	}
+
+	format(mode: 'long' | 'medium' | 'short' | 'iso') {
+		if (mode === 'iso') return this.#date.toISOString().split('T')[0];
+
+		let options: Intl.DateTimeFormatOptions;
+		switch (mode) {
+			case 'long': {
+				options = {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+				};
+				break;
+			}
+			case 'medium': {
+				options = {
+					month: 'short',
+					day: 'numeric',
+					year: 'numeric',
+				};
+				break;
+			}
+			case 'short': {
+				options = {
+					month: '2-digit',
+					day: '2-digit',
+					year: 'numeric',
+				};
+				break;
+			}
+		}
+
+		return new Intl.DateTimeFormat('de-DE', options).format(this.#date);
+	}
+
+	toString() {
+		return this.format('iso');
+	}
+
+	[Symbol.for('nodejs.util.inspect.custom')]() {
+		return `LocalDate {"${this}"}`;
+	}
 }

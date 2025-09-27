@@ -3,7 +3,7 @@
 
 	import { resolve } from '$app/paths';
 
-	import { convertDateToIsoString, formatDate } from '$lib/dates';
+	import { LocalDate } from '$lib/dates';
 	import { archiveTask, completeTask, getAllTasks } from '$lib/task.remote';
 </script>
 
@@ -13,7 +13,7 @@
 	<article>
 		<header>{task.title}</header>
 		<div class="grid text-xs">
-			<span>{formatDate(task.nextDueDate)}</span>
+			<span>{task.nextDueDate.format('medium')}</span>
 			<span>Alle {task.intervalDays} Tag(e)</span>
 			<span>{task.repeatMode}</span>
 		</div>
@@ -27,11 +27,7 @@
 			</a>
 			<form {...completeTask}>
 				<input type="hidden" name="id" value={task.id} />
-				<input
-					type="hidden"
-					name="completionDate"
-					value={convertDateToIsoString(new Date())}
-				/>
+				<input type="hidden" name="completionDate" value={LocalDate.now()} />
 				<button><Check size={16} /></button>
 			</form>
 

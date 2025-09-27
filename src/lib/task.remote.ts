@@ -6,13 +6,13 @@ import { form, query } from '$app/server';
 
 import * as table from '$lib/server/db/schema';
 
-import { addToDate } from './dates';
+import { LocalDate } from './dates';
 import { db } from './server/db';
 
 export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date(),
+		nextDueDate: z.iso.date().transform((d) => LocalDate.of(d)),
 		intervalDays: z.coerce.number<string>().int().min(1),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
@@ -35,7 +35,7 @@ export const editTask = form(
 	z.object({
 		id: z.coerce.number<string>().int(),
 		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date(),
+		nextDueDate: z.iso.date().transform((d) => LocalDate.of(d)),
 		intervalDays: z.coerce.number<string>().int().min(1),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
@@ -60,7 +60,7 @@ export const editTask = form(
 export const completeTask = form(
 	z.object({
 		id: z.coerce.number<string>().int(),
-		completionDate: z.iso.date(),
+		completionDate: z.iso.date().transform((d) => LocalDate.of(d)),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -75,12 +75,10 @@ export const completeTask = form(
 		await db
 			.update(table.task)
 			.set({
-				nextDueDate: addToDate(
-					task.repeatMode === 'fromCompletionDate'
-						? data.completionDate
-						: task.nextDueDate,
-					task.intervalDays,
-				),
+				nextDueDate: (task.repeatMode === 'fromCompletionDate'
+					? data.completionDate
+					: task.nextDueDate
+				).addDays(task.intervalDays),
 			})
 			.where(eq(table.task.id, data.id));
 
@@ -98,7 +96,27 @@ export const archiveTask = form(
 			.update(table.task)
 			.set({
 				archived: true,
-				archived_at: new Date(),
+				archivedAt: new Date(),
+			})
+			.where(eq(table.task.id, data.id));
+
+		await getTaskById(data.id).refresh();
+		await getAllTasks().refresh();
+	},
+);
+
+export const pauseTask = form(
+	z.object({
+		id: z.coerce.number<string>().int(),
+		countDays: z.coerce.number<string>().int(),
+	}),
+	async (data) => {
+		const task = await getTaskById(data.id);
+
+		await db
+			.update(table.task)
+			.set({
+				nextDueDate: task.nextDueDate.addDays(data.countDays),
 			})
 			.where(eq(table.task.id, data.id));
 

@@ -1,5 +1,22 @@
 import { sql } from 'drizzle-orm';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { customType, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+import { LocalDate } from '$lib/dates';
+
+const customDate = customType<{ data: LocalDate }>({
+	dataType() {
+		return 'text';
+	},
+	fromDriver(value: unknown): LocalDate {
+		if (typeof value !== 'string') throw new Error('invalid date in db: ' + value);
+
+		console.log('found in db', value, LocalDate.of(value));
+		return LocalDate.of(value);
+	},
+	toDriver(value: LocalDate): string {
+		return value.toString();
+	},
+});
 
 export const user = sqliteTable('user', {
 	id: text().primaryKey(),
@@ -18,17 +35,17 @@ export const session = sqliteTable('session', {
 export const task = sqliteTable('task', {
 	id: integer().primaryKey({ autoIncrement: true }),
 	title: text().notNull(),
-	nextDueDate: text().notNull(),
+	nextDueDate: customDate().notNull(),
 	intervalDays: integer().notNull(),
 	repeatMode: text({ enum: ['fromDueDate', 'fromCompletionDate'] }).notNull(),
 	archived: integer({ mode: 'boolean' }).notNull(),
-	created_at: integer({ mode: 'timestamp' })
+	createdAt: integer({ mode: 'timestamp' })
 		.notNull()
 		.default(sql`(unixepoch())`),
-	updated_at: integer({ mode: 'timestamp' })
+	updatedAt: integer({ mode: 'timestamp' })
 		.notNull()
 		.default(sql`(unixepoch())`), //.$onUpdate(() => sql`(unixepoch())`),
-	archived_at: integer({ mode: 'timestamp' }),
+	archivedAt: integer({ mode: 'timestamp' }),
 });
 
 export const taskCompleted = sqliteTable('task_completed', {
@@ -36,7 +53,7 @@ export const taskCompleted = sqliteTable('task_completed', {
 	taskId: integer()
 		.notNull()
 		.references(() => task.id),
-	completionDate: text().notNull(),
+	completionDate: customDate().notNull(),
 });
 
 export type Session = typeof session.$inferSelect;

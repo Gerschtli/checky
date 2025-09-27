@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { convertDateToIsoString } from '$lib/dates';
+	import { LocalDate } from '$lib/dates';
 	import { createTask } from '$lib/task.remote';
 </script>
 
@@ -28,7 +28,7 @@
 			type="date"
 			id={createTask.field('nextDueDate')}
 			name={createTask.field('nextDueDate')}
-			value={convertDateToIsoString(new Date())}
+			value={LocalDate.now()}
 			aria-invalid={createTask.issues?.nextDueDate ? true : undefined}
 			aria-errormessage="{createTask.field('nextDueDate')}-error"
 		/>
