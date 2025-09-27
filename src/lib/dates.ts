@@ -24,6 +24,10 @@ export class LocalDate {
 		return new LocalDate(newDate);
 	}
 
+	static min(localDate1: LocalDate, localDate2: LocalDate) {
+		return localDate1.#date < localDate2.#date ? localDate1 : localDate2;
+	}
+
 	diffDays(localDate: LocalDate) {
 		const diffTime = this.#date.getTime() - localDate.#date.getTime();
 		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

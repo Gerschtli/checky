@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import z from 'zod';
 
 import { command, form, query } from '$app/server';
@@ -222,4 +222,15 @@ export const getAllTasks = query(async () => {
 		intervalDays: t.intervalDays,
 		completed: t.tasksCompleted.length > 0,
 	}));
+});
+
+export const getTaskCompletions = query(z.int(), async (id) => {
+	const user = await getUser();
+
+	const completions = await db.query.tasksCompleted.findMany({
+		where: and(eq(table.tasksCompleted.taskId, id), eq(table.tasksCompleted.userId, user.id)),
+		orderBy: desc(table.tasksCompleted.completionDate),
+	});
+
+	return completions;
 });

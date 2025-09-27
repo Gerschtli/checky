@@ -1,16 +1,9 @@
 <script lang="ts">
-	import {
-		Archive,
-		Calendar,
-		CircleCheck,
-		CirclePause,
-		EllipsisVertical,
-		Pencil,
-	} from 'lucide-svelte';
+	import { Archive, CircleCheck, CirclePause, EllipsisVertical, Pencil } from 'lucide-svelte';
 
 	import { resolve } from '$app/paths';
 
-	import { LocalDate } from '$lib/dates';
+	import TaskInfo from '$lib/TaskInfo.svelte';
 	import {
 		archiveTask,
 		completeTask,
@@ -41,7 +34,6 @@
 {:else}
 	<div class="flex gap-4 flex-col">
 		{#each tasks as task (task.id)}
-			{@const dueInDays = task.nextDueDate.diffDays(LocalDate.now())}
 			<div
 				class={[
 					'flex items-center gap-4 p-3 sm:p-4 border rounded-lg transition-all duration-200',
@@ -58,7 +50,8 @@
 				/>
 
 				<div class="flex flex-col gap-1 grow">
-					<p
+					<a
+						href={resolve('/task/[id]', { id: `${task.id}` })}
 						class={[
 							'font-semibold',
 							task.completed
@@ -67,46 +60,9 @@
 						]}
 					>
 						{task.title}
-					</p>
-					<div
-						class={[
-							'flex items-center text-xs',
-							task.completed ? 'text-base-content/40' : 'text-base-content/50',
-						]}
-					>
-						<Calendar class="size-4 me-1" />
-						<div class="text-nowrap">{task.nextDueDate.format('medium')}</div>
-						<div class="mx-2">•</div>
-						<div class="text-nowrap">
-							{#if task.intervalDays === 1}
-								Täglich
-							{:else if task.intervalDays === 7}
-								Wöchentlich
-							{:else}
-								Alle {task.intervalDays} Tage
-							{/if}
-						</div>
-						<div class="mx-2">•</div>
+					</a>
 
-						<div
-							class={{
-								'text-xs': true,
-								'text-error': dueInDays < 0,
-								'text-warning': dueInDays === 0,
-								'text-success': dueInDays > 0,
-							}}
-						>
-							{#if dueInDays < 0}
-								Überfällig seit {Math.abs(dueInDays)}&nbsp;Tagen
-							{:else if dueInDays === 0}
-								Heute fällig
-							{:else if dueInDays === 1}
-								Morgen fällig
-							{:else if dueInDays > 0}
-								Fällig in {dueInDays}&nbsp;Tagen
-							{/if}
-						</div>
-					</div>
+					<TaskInfo {task} />
 				</div>
 
 				<button

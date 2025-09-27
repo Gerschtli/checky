@@ -3,7 +3,7 @@
 
 	import { editTask, getTaskById } from '$lib/task.remote';
 
-	const task = await getTaskById(parseInt(page.params.id!));
+	const task = $derived(await getTaskById(parseInt(page.params.id!)));
 </script>
 
 <h1 class="text-xl font-bold">Aufgabe bearbeiten</h1>
