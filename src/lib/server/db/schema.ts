@@ -33,6 +33,9 @@ export const sessions = sqliteTable('sessions', {
 
 export const tasks = sqliteTable('tasks', {
 	id: integer().primaryKey({ autoIncrement: true }),
+	userId: text()
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
 	title: text().notNull(),
 	nextDueDate: customDate().notNull(),
 	intervalDays: integer().notNull(),
@@ -55,6 +58,9 @@ export const tasksCompleted = sqliteTable(
 	'tasks_completed',
 	{
 		id: integer().primaryKey({ autoIncrement: true }),
+		userId: text()
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
 		taskId: integer()
 			.notNull()
 			.references(() => tasks.id, { onDelete: 'cascade' }),

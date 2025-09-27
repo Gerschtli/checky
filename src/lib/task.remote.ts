@@ -6,6 +6,7 @@ import { command, form, query } from '$app/server';
 
 import * as table from '$lib/server/db/schema';
 
+import { getUser } from './auth.remote';
 import { LocalDate } from './dates';
 import { db } from './server/db';
 
@@ -17,7 +18,10 @@ export const createTask = form(
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
+		const user = await getUser();
+
 		await db.insert(table.tasks).values({
+			userId: user.id,
 			title: data.title,
 			nextDueDate: data.nextDueDate,
 			intervalDays: data.intervalDays,
@@ -40,7 +44,9 @@ export const editTask = form(
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
-		await db
+		const user = await getUser();
+
+		const result = await db
 			.update(table.tasks)
 			.set({
 				title: data.title,
@@ -48,7 +54,9 @@ export const editTask = form(
 				intervalDays: data.intervalDays,
 				repeatMode: data.repeatMode,
 			})
-			.where(eq(table.tasks.id, data.id));
+			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
+
+		if (result.changes === 0) error(400);
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -66,9 +74,11 @@ export const completeTask = command(
 
 		if (task.archived) error(400);
 
+		const user = await getUser();
 		const completionDate = LocalDate.now();
 
 		await db.insert(table.tasksCompleted).values({
+			userId: user.id,
 			taskId: task.id,
 			dueDate: task.nextDueDate,
 			completionDate: completionDate,
@@ -98,8 +108,11 @@ export const uncompleteTask = command(
 
 		if (task.archived) error(400);
 
+		const user = await getUser();
+
 		const taskCompleted = await db.query.tasksCompleted.findFirst({
 			where: and(
+				eq(table.tasksCompleted.userId, user.id),
 				eq(table.tasksCompleted.taskId, task.id),
 				eq(table.tasksCompleted.completionDate, LocalDate.now()),
 			),
@@ -114,7 +127,7 @@ export const uncompleteTask = command(
 			.set({
 				nextDueDate: taskCompleted.dueDate,
 			})
-			.where(eq(table.tasks.id, data.id));
+			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -126,13 +139,15 @@ export const archiveTask = form(
 		id: z.coerce.number<string>().int(),
 	}),
 	async (data) => {
+		const user = await getUser();
+
 		await db
 			.update(table.tasks)
 			.set({
 				archived: true,
 				archivedAt: new Date(),
 			})
-			.where(eq(table.tasks.id, data.id));
+			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
@@ -160,8 +175,10 @@ export const pauseTask = form(
 );
 
 export const getTaskById = query(z.int(), async (id) => {
+	const user = await getUser();
+
 	const task = await db.query.tasks.findFirst({
-		where: eq(table.tasks.id, id),
+		where: and(eq(table.tasks.id, id), eq(table.tasks.userId, user.id)),
 	});
 
 	if (!task) error(404);
@@ -170,8 +187,10 @@ export const getTaskById = query(z.int(), async (id) => {
 });
 
 export const getAllTasks = query(async () => {
+	const user = await getUser();
+
 	const tasks = await db.query.tasks.findMany({
-		where: eq(table.tasks.archived, false),
+		where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
 		orderBy: table.tasks.nextDueDate,
 		with: {
 			tasksCompleted: {
