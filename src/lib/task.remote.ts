@@ -1,8 +1,8 @@
 import { error, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import z from 'zod';
 
-import { form, query } from '$app/server';
+import { command, form, query } from '$app/server';
 
 import * as table from '$lib/server/db/schema';
 
@@ -57,28 +57,62 @@ export const editTask = form(
 	},
 );
 
-export const completeTask = form(
+export const completeTask = command(
 	z.object({
-		id: z.coerce.number<string>().int(),
-		completionDate: z.iso.date().transform((d) => LocalDate.of(d)),
+		id: z.int(),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
 
 		if (task.archived) error(400);
 
+		const completionDate = LocalDate.now();
+
 		await db.insert(table.tasksCompleted).values({
 			taskId: task.id,
-			completionDate: data.completionDate,
+			dueDate: task.nextDueDate,
+			completionDate: completionDate,
 		});
 
 		await db
 			.update(table.tasks)
 			.set({
 				nextDueDate: (task.repeatMode === 'fromCompletionDate'
-					? data.completionDate
+					? completionDate
 					: task.nextDueDate
 				).addDays(task.intervalDays),
+			})
+			.where(eq(table.tasks.id, data.id));
+
+		await getTaskById(data.id).refresh();
+		await getAllTasks().refresh();
+	},
+);
+
+export const uncompleteTask = command(
+	z.object({
+		id: z.int(),
+	}),
+	async (data) => {
+		const task = await getTaskById(data.id);
+
+		if (task.archived) error(400);
+
+		const taskCompleted = await db.query.tasksCompleted.findFirst({
+			where: and(
+				eq(table.tasksCompleted.taskId, task.id),
+				eq(table.tasksCompleted.completionDate, LocalDate.now()),
+			),
+		});
+
+		if (!taskCompleted) error(400);
+
+		await db.delete(table.tasksCompleted).where(eq(table.tasksCompleted.id, taskCompleted.id));
+
+		await db
+			.update(table.tasks)
+			.set({
+				nextDueDate: taskCompleted.dueDate,
 			})
 			.where(eq(table.tasks.id, data.id));
 
@@ -126,19 +160,31 @@ export const pauseTask = form(
 );
 
 export const getTaskById = query(z.int(), async (id) => {
-	const result = await db.select().from(table.tasks).where(eq(table.tasks.id, id));
+	const task = await db.query.tasks.findFirst({
+		where: eq(table.tasks.id, id),
+	});
 
-	if (result.length === 0) error(404);
+	if (!task) error(404);
 
-	return result[0];
+	return task;
 });
 
 export const getAllTasks = query(async () => {
-	const tasks = await db
-		.select()
-		.from(table.tasks)
-		.where(eq(table.tasks.archived, false))
-		.orderBy(table.tasks.nextDueDate);
+	const tasks = await db.query.tasks.findMany({
+		where: eq(table.tasks.archived, false),
+		orderBy: table.tasks.nextDueDate,
+		with: {
+			tasksCompleted: {
+				where: eq(table.tasksCompleted.completionDate, LocalDate.now()),
+			},
+		},
+	});
 
-	return tasks.map((t) => ({ ...t, completed: false }));
+	return tasks.map((t) => ({
+		id: t.id,
+		title: t.title,
+		nextDueDate: t.nextDueDate,
+		intervalDays: t.intervalDays,
+		completed: t.tasksCompleted.length > 0,
+	}));
 });

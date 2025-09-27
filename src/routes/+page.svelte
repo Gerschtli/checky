@@ -11,9 +11,23 @@
 	import { resolve } from '$app/paths';
 
 	import { LocalDate } from '$lib/dates';
-	import { archiveTask, getAllTasks, pauseTask } from '$lib/task.remote';
+	import {
+		archiveTask,
+		completeTask,
+		getAllTasks,
+		pauseTask,
+		uncompleteTask,
+	} from '$lib/task.remote';
 
 	const tasks = $derived(await getAllTasks());
+
+	async function onTaskCheckboxChange(id: number, taskCompleted: boolean) {
+		if (taskCompleted) {
+			await completeTask({ id });
+		} else {
+			await uncompleteTask({ id });
+		}
+	}
 </script>
 
 {#if tasks.length === 0}
@@ -39,6 +53,8 @@
 					name="complete"
 					class="checkbox checkbox-md shrink-0"
 					checked={task.completed}
+					onchange={async (e) =>
+						await onTaskCheckboxChange(task.id, e.currentTarget.checked)}
 				/>
 
 				<div class="flex flex-col gap-1 grow">

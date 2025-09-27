@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
-import { customType, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { relations, sql } from 'drizzle-orm';
+import { customType, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import { LocalDate } from '../../dates';
 
@@ -27,7 +27,7 @@ export const sessions = sqliteTable('sessions', {
 	id: text().primaryKey(),
 	userId: text()
 		.notNull()
-		.references(() => users.id),
+		.references(() => users.id, { onDelete: 'cascade' }),
 	expiresAt: integer({ mode: 'timestamp' }).notNull(),
 });
 
@@ -47,13 +47,34 @@ export const tasks = sqliteTable('tasks', {
 	archivedAt: integer({ mode: 'timestamp' }),
 });
 
-export const tasksCompleted = sqliteTable('tasks_completed', {
-	id: integer().primaryKey({ autoIncrement: true }),
-	taskId: integer()
-		.notNull()
-		.references(() => tasks.id),
-	completionDate: customDate().notNull(),
-});
+export const tasksRelations = relations(tasks, ({ many }) => ({
+	tasksCompleted: many(tasksCompleted),
+}));
+
+export const tasksCompleted = sqliteTable(
+	'tasks_completed',
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		taskId: integer()
+			.notNull()
+			.references(() => tasks.id, { onDelete: 'cascade' }),
+		dueDate: customDate().notNull(),
+		completionDate: customDate().notNull(),
+	},
+	(table) => [
+		uniqueIndex('tasks_completed_idx_task_id_completion_date').on(
+			table.taskId,
+			table.completionDate,
+		),
+	],
+);
+
+export const tasksCompletedRelations = relations(tasksCompleted, ({ one }) => ({
+	task: one(tasks, {
+		fields: [tasksCompleted.taskId],
+		references: [tasks.id],
+	}),
+}));
 
 export type Session = typeof sessions.$inferSelect;
 
