@@ -10,7 +10,6 @@ const customDate = customType<{ data: LocalDate }>({
 	fromDriver(value: unknown): LocalDate {
 		if (typeof value !== 'string') throw new Error('invalid date in db: ' + value);
 
-		console.log('found in db', value, LocalDate.of(value));
 		return LocalDate.of(value);
 	},
 	toDriver(value: LocalDate): string {

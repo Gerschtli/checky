@@ -134,5 +134,11 @@ export const getTaskById = query(z.int(), async (id) => {
 });
 
 export const getAllTasks = query(async () => {
-	return await db.select().from(table.task).where(eq(table.task.archived, false));
+	const tasks = await db
+		.select()
+		.from(table.task)
+		.where(eq(table.task.archived, false))
+		.orderBy(table.task.nextDueDate);
+
+	return tasks.map((t) => ({ ...t, completed: false }));
 });

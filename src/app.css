@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+@plugin 'daisyui';
+
+button:where(:not([disabled])) {
+	cursor: pointer;
+}
