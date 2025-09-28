@@ -89,6 +89,4 @@ export const tasksCompletedRelations = relations(tasksCompleted, ({ one }) => ({
 	}),
 }));
 
-export type Session = typeof sessions.$inferSelect;
-
-export type User = typeof users.$inferSelect;
+export type SessionInsert = typeof sessions.$inferInsert;
