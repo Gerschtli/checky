@@ -75,8 +75,9 @@ export const tasksCompleted = sqliteTable(
 		...auditColumns,
 	},
 	(table) => [
-		uniqueIndex('tasks_completed_idx_task_id_completion_date').on(
+		uniqueIndex('tasks_completed_idx_task_id_due_date_completion_date').on(
 			table.taskId,
+			table.dueDate,
 			table.completionDate,
 		),
 	],

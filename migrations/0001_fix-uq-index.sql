@@ -1,0 +1,2 @@
+DROP INDEX `tasks_completed_idx_task_id_completion_date`;--> statement-breakpoint
+CREATE UNIQUE INDEX `tasks_completed_idx_task_id_due_date_completion_date` ON `tasks_completed` (`task_id`,`due_date`,`completion_date`);

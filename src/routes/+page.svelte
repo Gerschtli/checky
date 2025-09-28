@@ -50,7 +50,7 @@
 					type="checkbox"
 					name="complete"
 					class="checkbox checkbox-md shrink-0"
-					checked={task.completed}
+					bind:checked={task.completed}
 					onchange={async (e) =>
 						await onTaskCheckboxChange(task.id, e.currentTarget.checked)}
 				/>

@@ -225,7 +225,7 @@ export const getTaskCompletions = query(z.int(), async (id) => {
 
 	const completions = await db.query.tasksCompleted.findMany({
 		where: and(eq(table.tasksCompleted.taskId, id), eq(table.tasksCompleted.userId, user.id)),
-		orderBy: desc(table.tasksCompleted.completionDate),
+		orderBy: [desc(table.tasksCompleted.completionDate), desc(table.tasksCompleted.dueDate)],
 	});
 
 	return completions;

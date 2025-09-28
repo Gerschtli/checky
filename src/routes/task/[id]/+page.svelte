@@ -50,11 +50,15 @@
 		{formatNumber(average.perWeek)} mal pro Woche / alle {formatNumber(average.everyNDays)} Tage
 	</p>
 
-	<ul class="list-disc ps-4 text-sm">
+	<ol class="list-decimal ps-6 text-sm">
 		{#each completions.current as completion (completion.id)}
-			<li>{completion.completionDate.format('medium')}</li>
+			<li>
+				{completion.completionDate.format('long')} (Fällig am {completion.dueDate.format(
+					'medium',
+				)})
+			</li>
 		{/each}
-	</ul>
+	</ol>
 {:else if completions.loading}
 	<span class="loading loading-dots loading-md"></span>
 {/if}
