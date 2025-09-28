@@ -35,8 +35,6 @@ export const createTask = form(
 			archived: false,
 		});
 
-		await getAllTasks({}).refresh();
-
 		redirect(303, '/');
 	},
 );
@@ -65,7 +63,6 @@ export const editTask = form(
 		if (result.rowsAffected === 0) error(400);
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks({}).refresh();
 
 		redirect(303, '/');
 	},
@@ -99,7 +96,8 @@ export const completeTask = command(
 			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks({}).refresh();
+		await getAllTasks().refresh();
+		await getAllTasksForDate({ now: data.completionDate }).refresh();
 	},
 );
 
@@ -150,7 +148,8 @@ export const uncompleteTask = command(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks({}).refresh();
+		await getAllTasks().refresh();
+		await getAllTasksForDate({ now: data.completionDate }).refresh();
 	},
 );
 
@@ -170,7 +169,7 @@ export const archiveTask = form(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks({}).refresh();
+		await getAllTasks().refresh();
 	},
 );
 
@@ -190,7 +189,7 @@ export const pauseTask = form(
 			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks({}).refresh();
+		await getAllTasks().refresh();
 	},
 );
 
@@ -206,10 +205,13 @@ export const getTaskById = query(z.int(), async (id) => {
 	return task;
 });
 
-export const getAllTasks = query(
+export const getAllTasks = query(async () => {
+	return await getAllTasksForDate({ now: LocalDate.now() });
+});
+
+export const getAllTasksForDate = query(
 	z.object({
-		// TODO: remove default value and call refresh for every input
-		now: instanceOfLocalDate().default(() => LocalDate.now()),
+		now: instanceOfLocalDate(),
 	}),
 	async (data) => {
 		const user = await getUser();

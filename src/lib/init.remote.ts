@@ -93,5 +93,5 @@ export const initData = command(async () => {
 		}
 	}
 
-	await getAllTasks({}).refresh();
+	await getAllTasks().refresh();
 });

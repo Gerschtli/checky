@@ -18,13 +18,15 @@
 		archiveTask,
 		completeTask,
 		getAllTasks,
+		getAllTasksForDate,
 		pauseTask,
 		uncompleteTask,
 	} from '$lib/task.remote';
 
 	let now = $state(LocalDate.now());
+	const timeTravel = $derived(!now.equals(LocalDate.now()));
 
-	const tasks = $derived(await getAllTasks({ now }));
+	const tasks = $derived(timeTravel ? await getAllTasksForDate({ now }) : await getAllTasks());
 
 	async function onTaskCheckboxChange(id: number, taskCompleted: boolean) {
 		if (taskCompleted) {
@@ -35,7 +37,7 @@
 	}
 </script>
 
-{#if !now.equals(LocalDate.now())}
+{#if timeTravel}
 	<div role="alert" class="alert alert-warning mb-4">
 		<TriangleAlert />
 		<!-- prettier-ignore -->
@@ -49,11 +51,7 @@
 {/if}
 
 <button class="btn btn-accent mb-4" onclick={() => (now = now.addDays(-1))}>Tag zurück</button>
-<button
-	class="btn btn-accent mb-4"
-	onclick={() => (now = now.addDays(1))}
-	disabled={now.equals(LocalDate.now())}
->
+<button class="btn btn-accent mb-4" onclick={() => (now = now.addDays(1))} disabled={!timeTravel}>
 	Tag vor
 </button>
 
@@ -113,7 +111,7 @@
 				</button>
 
 				<div
-					class="max-sm:flex max-sm:dropdown max-sm:dropdown-end max-sm:menu max-sm:w-52 max-sm:rounded-box max-sm:bg-base-100 max-sm:shadow-md max-sm:flex-col max-sm:gap-2 sm:flex sm:items-center sm:gap-1 sm:relative sm:shrink-0"
+					class="max-sm:flex max-sm:dropdown max-sm:dropdown-end max-sm:menu max-sm:w-52 max-sm:rounded-box max-sm:bg-base-100 max-sm:shadow-md max-sm:flex-col max-sm:gap-2 sm:flex sm:items-center sm:gap-1 sm:relative sm:bg-transparent sm:shrink-0"
 					popover
 					id="action-{task.id}"
 					style:position-anchor="--anchor-{task.id}"
