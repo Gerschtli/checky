@@ -17,10 +17,20 @@ const customDate = customType<{ data: LocalDate }>({
 	},
 });
 
+const auditColumns = {
+	createdAt: integer({ mode: 'timestamp' })
+		.notNull()
+		.default(sql`(unixepoch())`),
+	updatedAt: integer({ mode: 'timestamp' })
+		.notNull()
+		.$onUpdate(() => new Date()),
+};
+
 export const users = sqliteTable('users', {
 	id: text().primaryKey(),
 	username: text().notNull().unique(),
 	passwordHash: text().notNull(),
+	...auditColumns,
 });
 
 export const sessions = sqliteTable('sessions', {
@@ -29,6 +39,7 @@ export const sessions = sqliteTable('sessions', {
 		.notNull()
 		.references(() => users.id, { onDelete: 'cascade' }),
 	expiresAt: integer({ mode: 'timestamp' }).notNull(),
+	...auditColumns,
 });
 
 export const tasks = sqliteTable('tasks', {
@@ -41,13 +52,8 @@ export const tasks = sqliteTable('tasks', {
 	intervalDays: integer().notNull(),
 	repeatMode: text({ enum: ['fromDueDate', 'fromCompletionDate'] }).notNull(),
 	archived: integer({ mode: 'boolean' }).notNull(),
-	createdAt: integer({ mode: 'timestamp' })
-		.notNull()
-		.default(sql`(unixepoch())`),
-	updatedAt: integer({ mode: 'timestamp' })
-		.notNull()
-		.default(sql`(unixepoch())`), //.$onUpdate(() => sql`(unixepoch())`),
 	archivedAt: integer({ mode: 'timestamp' }),
+	...auditColumns,
 });
 
 export const tasksRelations = relations(tasks, ({ many }) => ({
@@ -66,6 +72,7 @@ export const tasksCompleted = sqliteTable(
 			.references(() => tasks.id, { onDelete: 'cascade' }),
 		dueDate: customDate().notNull(),
 		completionDate: customDate().notNull(),
+		...auditColumns,
 	},
 	(table) => [
 		uniqueIndex('tasks_completed_idx_task_id_completion_date').on(
