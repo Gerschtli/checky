@@ -28,6 +28,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<link rel="manifest" href="/site.webmanifest" />
 </svelte:head>
 
 <header class="shadow-sm bg-base-100">

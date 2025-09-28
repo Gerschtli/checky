@@ -1,0 +1,7 @@
+{
+	"name": "Checky",
+	"short_name": "Checky",
+	"theme_color": "#ffffff",
+	"background_color": "#ffffff",
+	"display": "standalone"
+}
