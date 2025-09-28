@@ -8,7 +8,8 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			regions: 'eu-west-1',
+			runtime: 'nodejs22.x',
+			regions: ['eu-west-1'],
 		}),
 		experimental: {
 			remoteFunctions: true,
