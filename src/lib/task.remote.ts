@@ -10,10 +10,9 @@ import { getUser } from './auth.remote';
 import { LocalDate } from './dates';
 import { db } from './server/db';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-function instanceOf<T>(type: Function) {
-	return z.custom<T>((data) => data instanceof type, {
-		message: `Input not instance of ${type.name}`,
+function instanceOfLocalDate() {
+	return z.custom<LocalDate>((data) => data instanceof LocalDate, {
+		message: `Input not instance of LocalDate`,
 	});
 }
 
@@ -75,7 +74,7 @@ export const editTask = form(
 export const completeTask = command(
 	z.object({
 		id: z.int(),
-		completionDate: instanceOf<LocalDate>(LocalDate),
+		completionDate: instanceOfLocalDate(),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -122,7 +121,7 @@ function calculateNextDueDate(
 export const uncompleteTask = command(
 	z.object({
 		id: z.int(),
-		completionDate: instanceOf<LocalDate>(LocalDate),
+		completionDate: instanceOfLocalDate(),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -210,7 +209,7 @@ export const getTaskById = query(z.int(), async (id) => {
 export const getAllTasks = query(
 	z.object({
 		// TODO: remove default value and call refresh for every input
-		now: instanceOf<LocalDate>(LocalDate).default(() => LocalDate.now()),
+		now: instanceOfLocalDate().default(() => LocalDate.now()),
 	}),
 	async (data) => {
 		const user = await getUser();
