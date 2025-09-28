@@ -9,7 +9,7 @@ const config = {
 	kit: {
 		adapter: adapter({
 			runtime: 'nodejs22.x',
-			regions: ['eu-west-1'],
+			regions: ['fra1'],
 		}),
 		experimental: {
 			remoteFunctions: true,
