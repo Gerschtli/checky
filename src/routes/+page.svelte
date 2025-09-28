@@ -1,10 +1,18 @@
 <script lang="ts">
-	import { Archive, CircleCheck, CirclePause, EllipsisVertical, Pencil } from 'lucide-svelte';
+	import {
+		Archive,
+		CircleCheck,
+		CirclePause,
+		EllipsisVertical,
+		Pencil,
+		TriangleAlert,
+	} from 'lucide-svelte';
 
 	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';
 
 	import TaskInfo from '$lib/TaskInfo.svelte';
+	import { LocalDate } from '$lib/dates';
 	import { initData } from '$lib/init.remote';
 	import {
 		archiveTask,
@@ -14,16 +22,40 @@
 		uncompleteTask,
 	} from '$lib/task.remote';
 
-	const tasks = $derived(await getAllTasks());
+	let now = $state(LocalDate.now());
+
+	const tasks = $derived(await getAllTasks({ now }));
 
 	async function onTaskCheckboxChange(id: number, taskCompleted: boolean) {
 		if (taskCompleted) {
-			await completeTask({ id });
+			await completeTask({ id, completionDate: now });
 		} else {
-			await uncompleteTask({ id });
+			await uncompleteTask({ id, completionDate: now });
 		}
 	}
 </script>
+
+{#if !now.equals(LocalDate.now())}
+	<div role="alert" class="alert alert-warning mb-4">
+		<TriangleAlert />
+		<!-- prettier-ignore -->
+		<span>
+			Back to the future!
+			<br />
+			Du siehst die Übersicht vom
+			<strong class="text-nowrap">{now.format('long')}</strong>.
+		</span>
+	</div>
+{/if}
+
+<button class="btn btn-accent mb-4" onclick={() => (now = now.addDays(-1))}>Tag zurück</button>
+<button
+	class="btn btn-accent mb-4"
+	onclick={() => (now = now.addDays(1))}
+	disabled={now.equals(LocalDate.now())}
+>
+	Tag vor
+</button>
 
 {#if dev}
 	<button class="btn btn-warning mb-4" onclick={() => initData()}>Testdaten generieren</button>

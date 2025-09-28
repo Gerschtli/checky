@@ -10,6 +10,13 @@ import { getUser } from './auth.remote';
 import { LocalDate } from './dates';
 import { db } from './server/db';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+function instanceOf<T>(type: Function) {
+	return z.custom<T>((data) => data instanceof type, {
+		message: `Input not instance of ${type.name}`,
+	});
+}
+
 export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
@@ -29,7 +36,7 @@ export const createTask = form(
 			archived: false,
 		});
 
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 
 		redirect(303, '/');
 	},
@@ -59,7 +66,7 @@ export const editTask = form(
 		if (result.rowsAffected === 0) error(400);
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 
 		redirect(303, '/');
 	},
@@ -68,6 +75,7 @@ export const editTask = form(
 export const completeTask = command(
 	z.object({
 		id: z.int(),
+		completionDate: instanceOf<LocalDate>(LocalDate),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -75,7 +83,7 @@ export const completeTask = command(
 		if (task.archived) error(400);
 
 		const user = await getUser();
-		const completionDate = LocalDate.now();
+		const completionDate = data.completionDate;
 
 		await db.insert(table.tasksCompleted).values({
 			userId: user.id,
@@ -92,7 +100,7 @@ export const completeTask = command(
 			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 	},
 );
 
@@ -114,6 +122,7 @@ function calculateNextDueDate(
 export const uncompleteTask = command(
 	z.object({
 		id: z.int(),
+		completionDate: instanceOf<LocalDate>(LocalDate),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -126,7 +135,7 @@ export const uncompleteTask = command(
 			where: and(
 				eq(table.tasksCompleted.userId, user.id),
 				eq(table.tasksCompleted.taskId, task.id),
-				eq(table.tasksCompleted.completionDate, LocalDate.now()),
+				eq(table.tasksCompleted.completionDate, data.completionDate),
 			),
 		});
 
@@ -142,7 +151,7 @@ export const uncompleteTask = command(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 	},
 );
 
@@ -162,7 +171,7 @@ export const archiveTask = form(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 	},
 );
 
@@ -182,7 +191,7 @@ export const pauseTask = form(
 			.where(eq(table.tasks.id, data.id));
 
 		await getTaskById(data.id).refresh();
-		await getAllTasks().refresh();
+		await getAllTasks({}).refresh();
 	},
 );
 
@@ -198,27 +207,33 @@ export const getTaskById = query(z.int(), async (id) => {
 	return task;
 });
 
-export const getAllTasks = query(async () => {
-	const user = await getUser();
+export const getAllTasks = query(
+	z.object({
+		// TODO: remove default value and call refresh for every input
+		now: instanceOf<LocalDate>(LocalDate).default(() => LocalDate.now()),
+	}),
+	async (data) => {
+		const user = await getUser();
 
-	const tasks = await db.query.tasks.findMany({
-		where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
-		orderBy: table.tasks.nextDueDate,
-		with: {
-			tasksCompleted: {
-				where: eq(table.tasksCompleted.completionDate, LocalDate.now()),
+		const tasks = await db.query.tasks.findMany({
+			where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
+			orderBy: table.tasks.nextDueDate,
+			with: {
+				tasksCompleted: {
+					where: eq(table.tasksCompleted.completionDate, data.now),
+				},
 			},
-		},
-	});
+		});
 
-	return tasks.map((t) => ({
-		id: t.id,
-		title: t.title,
-		nextDueDate: t.nextDueDate,
-		intervalDays: t.intervalDays,
-		completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(LocalDate.now()),
-	}));
-});
+		return tasks.map((t) => ({
+			id: t.id,
+			title: t.title,
+			nextDueDate: t.nextDueDate,
+			intervalDays: t.intervalDays,
+			completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
+		}));
+	},
+);
 
 export const getTaskCompletions = query(z.int(), async (id) => {
 	const user = await getUser();

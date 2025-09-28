@@ -6,13 +6,15 @@ export class LocalDate {
 	}
 
 	static of(iso: string) {
-		return new LocalDate(new Date(iso));
+		return new LocalDate(new Date(iso + 'T00:00:00Z'));
 	}
 
 	static now() {
 		const today = new Date();
-		// Zeitzonen-Offset anpassen, um das korrekte lokale Datum zu erhalten
-		today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+		today.setUTCHours(0);
+		today.setUTCMinutes(0);
+		today.setUTCSeconds(0);
+		today.setUTCMilliseconds(0);
 
 		return new LocalDate(today);
 	}
@@ -37,6 +39,10 @@ export class LocalDate {
 
 	isAfter(localDate: LocalDate) {
 		return this.#date > localDate.#date;
+	}
+
+	equals(localDate: LocalDate) {
+		return this.#date.getTime() === localDate.#date.getTime();
 	}
 
 	format(mode: 'long' | 'medium' | 'short' | 'iso') {
