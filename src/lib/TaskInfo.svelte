@@ -4,6 +4,7 @@
 	import { LocalDate } from './dates';
 
 	interface Props {
+		now?: LocalDate;
 		task: {
 			completed?: boolean;
 			nextDueDate: LocalDate;
@@ -11,9 +12,9 @@
 		};
 	}
 
-	const { task }: Props = $props();
+	const { now, task }: Props = $props();
 
-	const dueInDays = $derived(task.nextDueDate.diffDays(LocalDate.now()));
+	const dueInDays = $derived(task.nextDueDate.diffDays(now ?? LocalDate.now()));
 </script>
 
 <div

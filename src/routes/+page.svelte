@@ -98,7 +98,7 @@
 						{task.title}
 					</a>
 
-					<TaskInfo {task} />
+					<TaskInfo {now} {task} />
 				</div>
 
 				<button
