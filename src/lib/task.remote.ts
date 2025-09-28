@@ -108,11 +108,7 @@ function calculateNextDueDate(
 		return completionDate.addDays(task.intervalDays);
 	}
 
-	const candidate = task.nextDueDate.addDays(task.intervalDays);
-
-	if (completionDate.diffDays(candidate) > 0) return completionDate.addDays(1);
-
-	return candidate;
+	return task.nextDueDate.addDays(task.intervalDays);
 }
 
 export const uncompleteTask = command(
@@ -220,7 +216,7 @@ export const getAllTasks = query(async () => {
 		title: t.title,
 		nextDueDate: t.nextDueDate,
 		intervalDays: t.intervalDays,
-		completed: t.tasksCompleted.length > 0,
+		completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(LocalDate.now()),
 	}));
 });
 

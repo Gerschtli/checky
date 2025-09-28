@@ -35,6 +35,10 @@ export class LocalDate {
 		return diffDays;
 	}
 
+	isAfter(localDate: LocalDate) {
+		return this.#date > localDate.#date;
+	}
+
 	format(mode: 'long' | 'medium' | 'short' | 'iso') {
 		if (mode === 'iso') return this.#date.toISOString().split('T')[0];
 
