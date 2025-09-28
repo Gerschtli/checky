@@ -218,7 +218,7 @@ export const getAllTasksForDate = query(
 
 		const tasks = await db.query.tasks.findMany({
 			where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
-			orderBy: table.tasks.nextDueDate,
+			orderBy: [table.tasks.nextDueDate, table.tasks.intervalDays, table.tasks.title],
 			with: {
 				tasksCompleted: {
 					where: eq(table.tasksCompleted.completionDate, data.now),
