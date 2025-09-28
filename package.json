@@ -50,8 +50,8 @@
 		"vitest": "^3.2.3"
 	},
 	"dependencies": {
+		"@libsql/client": "^0.15.15",
 		"@node-rs/argon2": "^2.0.2",
-		"better-sqlite3": "^12.4.1",
 		"lucide-svelte": "^0.544.0",
 		"zod": "^4.1.11"
 	},

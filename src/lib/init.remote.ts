@@ -86,7 +86,7 @@ export const initData = command(async () => {
 		for (const completion of task.completions) {
 			await db.insert(table.tasksCompleted).values({
 				userId: user.id,
-				taskId: result.lastInsertRowid as number,
+				taskId: Number(result.lastInsertRowid),
 				dueDate: completion.dueDate,
 				completionDate: completion.completionDate,
 			});

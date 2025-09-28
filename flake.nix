@@ -25,6 +25,8 @@
                   nodejs
                   nodejs.pkgs.pnpm
                   pkgs.sqlite-interactive
+                  pkgs.turso-cli
+                  pkgs.nodePackages.vercel
                 ];
               };
           });

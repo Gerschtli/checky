@@ -56,7 +56,7 @@ export const editTask = form(
 			})
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
-		if (result.changes === 0) error(400);
+		if (result.rowsAffected === 0) error(400);
 
 		await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
