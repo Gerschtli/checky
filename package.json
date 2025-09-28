@@ -24,7 +24,6 @@
 		"@eslint/js": "^9.22.0",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
-		"@sveltejs/adapter-node": "^5.2.12",
 		"@sveltejs/kit": "^2.22.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@tailwindcss/vite": "^4.0.0",
@@ -52,6 +51,7 @@
 	"dependencies": {
 		"@libsql/client": "^0.15.15",
 		"@node-rs/argon2": "^2.0.2",
+		"@sveltejs/adapter-vercel": "^5.10.2",
 		"lucide-svelte": "^0.544.0",
 		"zod": "^4.1.11"
 	},
