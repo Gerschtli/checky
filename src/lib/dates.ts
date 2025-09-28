@@ -11,10 +11,10 @@ export class LocalDate {
 
 	static now() {
 		const today = new Date();
-		today.setUTCHours(0);
-		today.setUTCMinutes(0);
-		today.setUTCSeconds(0);
-		today.setUTCMilliseconds(0);
+		today.setHours(0);
+		today.setMinutes(0);
+		today.setSeconds(0);
+		today.setMilliseconds(0);
 
 		return new LocalDate(today);
 	}
