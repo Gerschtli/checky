@@ -16,6 +16,13 @@
 			completionDate: LocalDate;
 		}[],
 	) {
+		if (completions.length === 0) {
+			return {
+				perWeek: 0,
+				everyNDays: 0,
+			};
+		}
+
 		const last = completions[completions.length - 1];
 		const earliest = LocalDate.min(last.dueDate, last.completionDate);
 
