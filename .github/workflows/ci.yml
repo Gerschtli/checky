@@ -117,9 +117,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Prepare .env
-        run: cp .env.example .env
-
       - run: pnpm install
 
       - run: pnpm db:migrate
