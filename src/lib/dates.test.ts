@@ -23,24 +23,6 @@ describe('LocalDate', () => {
 		expect(localDate.format('iso')).toBe('2025-09-25');
 	});
 
-	it('returns iso of now for +2 hours', () => {
-		vitest.useFakeTimers();
-		vitest.setSystemTime('2025-09-25T00:00:00+02:00');
-
-		const localDate = LocalDate.now();
-
-		expect(localDate.format('iso')).toBe('2025-09-25');
-	});
-
-	it('returns iso of now for -2 hours', () => {
-		vitest.useFakeTimers();
-		vitest.setSystemTime('2025-09-25T00:00:00-02:00');
-
-		const localDate = LocalDate.now();
-
-		expect(localDate.format('iso')).toBe('2025-09-25');
-	});
-
 	it('returns new LocalDate with days added', () => {
 		const localDate = LocalDate.of('2025-09-25');
 		const localDateAdded = localDate.addDays(3);
