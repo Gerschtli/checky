@@ -13,61 +13,61 @@ export const initData = command(async () => {
 	const tasks = [
 		{
 			title: 'Informationen für Tag notieren',
-			nextDueDate: LocalDate.of('2025-09-27'),
+			nextDueDate: LocalDate.fromIsoString('2025-09-27'),
 			intervalDays: 1,
 			repeatMode: 'fromDueDate' as const,
 			completions: [
 				{
-					dueDate: LocalDate.of('2025-09-22'),
-					completionDate: LocalDate.of('2025-09-22'),
+					dueDate: LocalDate.fromIsoString('2025-09-22'),
+					completionDate: LocalDate.fromIsoString('2025-09-22'),
 				},
 				{
-					dueDate: LocalDate.of('2025-09-23'),
-					completionDate: LocalDate.of('2025-09-23'),
+					dueDate: LocalDate.fromIsoString('2025-09-23'),
+					completionDate: LocalDate.fromIsoString('2025-09-23'),
 				},
 				{
-					dueDate: LocalDate.of('2025-09-24'),
-					completionDate: LocalDate.of('2025-09-24'),
+					dueDate: LocalDate.fromIsoString('2025-09-24'),
+					completionDate: LocalDate.fromIsoString('2025-09-24'),
 				},
 				{
-					dueDate: LocalDate.of('2025-09-25'),
-					completionDate: LocalDate.of('2025-09-25'),
+					dueDate: LocalDate.fromIsoString('2025-09-25'),
+					completionDate: LocalDate.fromIsoString('2025-09-25'),
 				},
 				{
-					dueDate: LocalDate.of('2025-09-26'),
-					completionDate: LocalDate.of('2025-09-26'),
+					dueDate: LocalDate.fromIsoString('2025-09-26'),
+					completionDate: LocalDate.fromIsoString('2025-09-26'),
 				},
 			],
 		},
 		{
 			title: 'Putzen',
-			nextDueDate: LocalDate.of('2025-10-02'),
+			nextDueDate: LocalDate.fromIsoString('2025-10-02'),
 			intervalDays: 7,
 			repeatMode: 'fromCompletionDate' as const,
 			completions: [
 				{
-					dueDate: LocalDate.of('2025-09-24'),
-					completionDate: LocalDate.of('2025-09-25'),
+					dueDate: LocalDate.fromIsoString('2025-09-24'),
+					completionDate: LocalDate.fromIsoString('2025-09-25'),
 				},
 				{
-					dueDate: LocalDate.of('2025-09-17'),
-					completionDate: LocalDate.of('2025-09-17'),
+					dueDate: LocalDate.fromIsoString('2025-09-17'),
+					completionDate: LocalDate.fromIsoString('2025-09-17'),
 				},
 			],
 		},
 		{
 			title: 'Uhr aufladen',
-			nextDueDate: LocalDate.of('2025-10-01'),
+			nextDueDate: LocalDate.fromIsoString('2025-10-01'),
 			intervalDays: 12,
 			repeatMode: 'fromCompletionDate' as const,
 			completions: [
 				{
-					dueDate: LocalDate.of('2025-10-01').addDays(-12),
-					completionDate: LocalDate.of('2025-10-01').addDays(-12),
+					dueDate: LocalDate.fromIsoString('2025-10-01').addDays(-12),
+					completionDate: LocalDate.fromIsoString('2025-10-01').addDays(-12),
 				},
 				{
-					dueDate: LocalDate.of('2025-10-01').addDays(-28),
-					completionDate: LocalDate.of('2025-10-01').addDays(-24),
+					dueDate: LocalDate.fromIsoString('2025-10-01').addDays(-28),
+					completionDate: LocalDate.fromIsoString('2025-10-01').addDays(-24),
 				},
 			],
 		},

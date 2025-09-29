@@ -19,7 +19,7 @@ function instanceOfLocalDate() {
 export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date().transform((d) => LocalDate.of(d)),
+		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
 		intervalDays: z.coerce.number<string>().int().min(1),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
@@ -43,7 +43,7 @@ export const editTask = form(
 	z.object({
 		id: z.coerce.number<string>().int(),
 		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date().transform((d) => LocalDate.of(d)),
+		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
 		intervalDays: z.coerce.number<string>().int().min(1),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),

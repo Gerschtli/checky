@@ -10,10 +10,10 @@ export function init() {
 export const transport: Transport = {
 	LocalDate: {
 		encode(value) {
-			return value instanceof LocalDate && [value.toString()];
+			return value instanceof LocalDate && [value.toIsoString()];
 		},
 		decode([iso]) {
-			return LocalDate.of(iso);
+			return LocalDate.fromIsoString(iso);
 		},
 	},
 };
