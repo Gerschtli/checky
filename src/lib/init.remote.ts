@@ -14,7 +14,8 @@ export const initData = command(async () => {
 		{
 			title: 'Informationen für Tag notieren',
 			nextDueDate: LocalDate.fromIsoString('2025-09-27'),
-			intervalDays: 1,
+			intervalCount: 1,
+			intervalType: 'days' as const,
 			repeatMode: 'fromDueDate' as const,
 			completions: [
 				{
@@ -42,7 +43,8 @@ export const initData = command(async () => {
 		{
 			title: 'Putzen',
 			nextDueDate: LocalDate.fromIsoString('2025-10-02'),
-			intervalDays: 7,
+			intervalCount: 7,
+			intervalType: 'days' as const,
 			repeatMode: 'fromCompletionDate' as const,
 			completions: [
 				{
@@ -58,7 +60,8 @@ export const initData = command(async () => {
 		{
 			title: 'Uhr aufladen',
 			nextDueDate: LocalDate.fromIsoString('2025-10-01'),
-			intervalDays: 12,
+			intervalCount: 12,
+			intervalType: 'days' as const,
 			repeatMode: 'fromCompletionDate' as const,
 			completions: [
 				{
@@ -71,6 +74,23 @@ export const initData = command(async () => {
 				},
 			],
 		},
+		{
+			title: 'Monatsabschluss',
+			nextDueDate: LocalDate.fromIsoString('2025-10-15'),
+			intervalCount: 1,
+			intervalType: 'months' as const,
+			repeatMode: 'fromCompletionDate' as const,
+			completions: [
+				{
+					dueDate: LocalDate.fromIsoString('2025-10-15').addMonths(-1),
+					completionDate: LocalDate.fromIsoString('2025-10-15').addMonths(-1),
+				},
+				{
+					dueDate: LocalDate.fromIsoString('2025-10-15').addMonths(-2),
+					completionDate: LocalDate.fromIsoString('2025-10-15').addMonths(-2),
+				},
+			],
+		},
 	];
 
 	for (const task of tasks) {
@@ -78,7 +98,8 @@ export const initData = command(async () => {
 			userId: user.id,
 			title: task.title,
 			nextDueDate: task.nextDueDate,
-			intervalDays: task.intervalDays,
+			intervalCount: task.intervalCount,
+			intervalType: task.intervalType,
 			repeatMode: task.repeatMode,
 			archived: false,
 		});

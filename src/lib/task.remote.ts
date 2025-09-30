@@ -20,7 +20,8 @@ export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
 		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalDays: z.coerce.number<string>().int().min(1),
+		intervalCount: z.coerce.number<string>().int().min(1),
+		intervalType: z.enum(['days', 'months']),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
@@ -30,7 +31,8 @@ export const createTask = form(
 			userId: user.id,
 			title: data.title,
 			nextDueDate: data.nextDueDate,
-			intervalDays: data.intervalDays,
+			intervalCount: data.intervalCount,
+			intervalType: data.intervalType,
 			repeatMode: data.repeatMode,
 			archived: false,
 		});
@@ -44,7 +46,8 @@ export const editTask = form(
 		id: z.coerce.number<string>().int(),
 		title: z.string().trim().min(1),
 		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalDays: z.coerce.number<string>().int().min(1),
+		intervalCount: z.coerce.number<string>().int().min(1),
+		intervalType: z.enum(['days', 'months']),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
@@ -55,7 +58,8 @@ export const editTask = form(
 			.set({
 				title: data.title,
 				nextDueDate: data.nextDueDate,
-				intervalDays: data.intervalDays,
+				intervalCount: data.intervalCount,
+				intervalType: data.intervalType,
 				repeatMode: data.repeatMode,
 			})
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
@@ -104,16 +108,22 @@ export const completeTask = command(
 function calculateNextDueDate(
 	task: {
 		nextDueDate: LocalDate;
-		intervalDays: number;
+		intervalCount: number;
+		intervalType: 'days' | 'months';
 		repeatMode: 'fromDueDate' | 'fromCompletionDate';
 	},
 	completionDate: LocalDate,
 ) {
-	if (task.repeatMode === 'fromCompletionDate') {
-		return completionDate.addDays(task.intervalDays);
-	}
+	const date = task.repeatMode === 'fromCompletionDate' ? completionDate : task.nextDueDate;
 
-	return task.nextDueDate.addDays(task.intervalDays);
+	switch (task.intervalType) {
+		case 'days': {
+			return date.addDays(task.intervalCount);
+		}
+		case 'months': {
+			return date.addMonths(task.intervalCount);
+		}
+	}
 }
 
 export const uncompleteTask = command(
@@ -218,7 +228,12 @@ export const getAllTasksForDate = query(
 
 		const tasks = await db.query.tasks.findMany({
 			where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
-			orderBy: [table.tasks.nextDueDate, table.tasks.intervalDays, table.tasks.title],
+			orderBy: [
+				table.tasks.nextDueDate,
+				table.tasks.intervalType,
+				table.tasks.intervalCount,
+				table.tasks.title,
+			],
 			with: {
 				tasksCompleted: {
 					where: eq(table.tasksCompleted.completionDate, data.now),
@@ -230,7 +245,8 @@ export const getAllTasksForDate = query(
 			id: t.id,
 			title: t.title,
 			nextDueDate: t.nextDueDate,
-			intervalDays: t.intervalDays,
+			intervalCount: t.intervalCount,
+			intervalType: t.intervalType,
 			completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
 		}));
 	},

@@ -8,7 +8,8 @@
 		task: {
 			completed?: boolean;
 			nextDueDate: LocalDate;
-			intervalDays: number;
+			intervalCount: number;
+			intervalType: 'days' | 'months';
 		};
 	}
 
@@ -27,12 +28,20 @@
 	<div class="text-nowrap">{task.nextDueDate.format('medium')}</div>
 	<div class="mx-2">•</div>
 	<div class="text-nowrap">
-		{#if task.intervalDays === 1}
-			Täglich
-		{:else if task.intervalDays === 7}
-			Wöchentlich
-		{:else}
-			Alle {task.intervalDays} Tage
+		{#if task.intervalType === 'days'}
+			{#if task.intervalCount === 1}
+				Täglich
+			{:else if task.intervalCount === 7}
+				Wöchentlich
+			{:else}
+				Alle {task.intervalCount} Tage
+			{/if}
+		{:else if task.intervalType === 'months'}
+			{#if task.intervalCount === 1}
+				Monatlich
+			{:else}
+				Alle {task.intervalCount} Monate
+			{/if}
 		{/if}
 	</div>
 	<div class="mx-2">•</div>

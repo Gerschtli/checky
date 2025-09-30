@@ -57,6 +57,13 @@ export class LocalDate {
 		return new LocalDate(newDate);
 	}
 
+	addMonths(numberOfMonths: number) {
+		const newDate = new Date(this.date);
+		newDate.setUTCMonth(newDate.getUTCMonth() + numberOfMonths);
+
+		return new LocalDate(newDate);
+	}
+
 	static min(localDate1: LocalDate, localDate2: LocalDate) {
 		return localDate1.date < localDate2.date ? localDate1 : localDate2;
 	}

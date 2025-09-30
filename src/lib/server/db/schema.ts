@@ -49,7 +49,10 @@ export const tasks = sqliteTable('tasks', {
 		.references(() => users.id, { onDelete: 'cascade' }),
 	title: text().notNull(),
 	nextDueDate: customDate().notNull(),
-	intervalDays: integer().notNull(),
+	intervalCount: integer().notNull(),
+	intervalType: text({ enum: ['days', 'months'] })
+		.notNull()
+		.default('days'),
 	repeatMode: text({ enum: ['fromDueDate', 'fromCompletionDate'] }).notNull(),
 	archived: integer({ mode: 'boolean' }).notNull(),
 	archivedAt: integer({ mode: 'timestamp' }),

@@ -46,21 +46,41 @@
 	</div>
 
 	<div class="flex flex-col">
-		<label class="label" for={createTask.field('intervalDays')}>
-			Wiederholungsintervall in Tagen
-		</label>
+		<label class="label" for={createTask.field('intervalCount')}>Wiederholungsintervall</label>
 		<input
 			type="number"
 			class="input w-full"
-			id={createTask.field('intervalDays')}
-			name={createTask.field('intervalDays')}
+			id={createTask.field('intervalCount')}
+			name={createTask.field('intervalCount')}
 			value="1"
-			aria-invalid={createTask.issues?.intervalDays ? true : undefined}
-			aria-errormessage="{createTask.field('intervalDays')}-error"
+			aria-invalid={createTask.issues?.intervalCount ? true : undefined}
+			aria-errormessage="{createTask.field('intervalCount')}-error"
 		/>
-		{#if createTask.issues?.intervalDays}
-			{#each createTask.issues.intervalDays as issue, i (i)}
-				<small class="text-error" id="{createTask.field('intervalDays')}-error">
+		{#if createTask.issues?.intervalCount}
+			{#each createTask.issues.intervalCount as issue, i (i)}
+				<small class="text-error" id="{createTask.field('intervalCount')}-error">
+					{issue.message}
+				</small>
+			{/each}
+		{/if}
+	</div>
+
+	<div class="flex flex-col">
+		<label class="label" for={createTask.field('intervalType')}>Wiederholungsintervall</label>
+		<select
+			class="w-full select"
+			id={createTask.field('intervalType')}
+			name={createTask.field('intervalType')}
+			value="days"
+			aria-invalid={createTask.issues?.intervalType ? true : undefined}
+			aria-errormessage="{createTask.field('intervalType')}-error"
+		>
+			<option value="days">n Mal pro Tag</option>
+			<option value="months">n Mal pro Monat</option>
+		</select>
+		{#if createTask.issues?.intervalType}
+			{#each createTask.issues.intervalType as issue, i (i)}
+				<small class="text-error" id="{createTask.field('intervalType')}-error">
 					{issue.message}
 				</small>
 			{/each}

@@ -15,6 +15,13 @@
       "when": 1759091230196,
       "tag": "0001_fix-uq-index",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1759258723993,
+      "tag": "0002_add-interval-type",
+      "breakpoints": true
     }
   ]
 }
