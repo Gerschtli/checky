@@ -81,8 +81,8 @@
 			aria-invalid={editTask.issues?.intervalType ? true : undefined}
 			aria-errormessage="{editTask.field('intervalType')}-error"
 		>
-			<option value="days">n Mal pro Tag</option>
-			<option value="months">n Mal pro Monat</option>
+			<option value="days">alle n Tage</option>
+			<option value="months">alle n Monate</option>
 		</select>
 		{#if editTask.issues?.intervalType}
 			{#each editTask.issues.intervalType as issue, i (i)}

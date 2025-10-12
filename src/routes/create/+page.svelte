@@ -32,7 +32,7 @@
 			class="input w-full"
 			id={createTask.field('nextDueDate')}
 			name={createTask.field('nextDueDate')}
-			value={LocalDate.now().addDays(1)}
+			value={LocalDate.now()}
 			aria-invalid={createTask.issues?.nextDueDate ? true : undefined}
 			aria-errormessage="{createTask.field('nextDueDate')}-error"
 		/>
@@ -75,8 +75,8 @@
 			aria-invalid={createTask.issues?.intervalType ? true : undefined}
 			aria-errormessage="{createTask.field('intervalType')}-error"
 		>
-			<option value="days">n Mal pro Tag</option>
-			<option value="months">n Mal pro Monat</option>
+			<option value="days">alle n Tage</option>
+			<option value="months">alle n Monate</option>
 		</select>
 		{#if createTask.issues?.intervalType}
 			{#each createTask.issues.intervalType as issue, i (i)}
