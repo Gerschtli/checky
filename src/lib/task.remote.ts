@@ -277,7 +277,36 @@ export const getAllTasksForDate = query(
 				intervalCount: t.intervalCount,
 				intervalType: t.intervalType,
 				completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
-			}));
+			}))
+			.reduce(
+				(agg, current) => {
+					if (current.nextDueDate.isAfter(data.now) && !current.completed) {
+						agg.later.push(current);
+					} else {
+						agg.now.push(current);
+					}
+
+					return agg;
+				},
+				{
+					now: [] as {
+						id: number;
+						title: string;
+						nextDueDate: LocalDate;
+						intervalCount: number;
+						intervalType: 'days' | 'months';
+						completed: boolean;
+					}[],
+					later: [] as {
+						id: number;
+						title: string;
+						nextDueDate: LocalDate;
+						intervalCount: number;
+						intervalType: 'days' | 'months';
+						completed: boolean;
+					}[],
+				},
+			);
 	},
 );
 
