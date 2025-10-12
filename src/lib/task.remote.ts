@@ -219,6 +219,18 @@ export const getAllTasks = query(async () => {
 	return await getAllTasksForDate({ now: LocalDate.now() });
 });
 
+function makeMultiCriteriaSort<T>(...criteria: ((a: T, b: T) => number)[]) {
+	return (a: T, b: T) => {
+		for (let i = 0; i < criteria.length; i++) {
+			const curCriteriaComparatorValue = criteria[i](a, b);
+			if (curCriteriaComparatorValue !== 0) {
+				return curCriteriaComparatorValue;
+			}
+		}
+		return 0;
+	};
+}
+
 export const getAllTasksForDate = query(
 	z.object({
 		now: instanceOfLocalDate(),
@@ -228,12 +240,6 @@ export const getAllTasksForDate = query(
 
 		const tasks = await db.query.tasks.findMany({
 			where: and(eq(table.tasks.archived, false), eq(table.tasks.userId, user.id)),
-			orderBy: [
-				table.tasks.nextDueDate,
-				table.tasks.intervalType,
-				table.tasks.intervalCount,
-				table.tasks.title,
-			],
 			with: {
 				tasksCompleted: {
 					where: eq(table.tasksCompleted.completionDate, data.now),
@@ -241,14 +247,37 @@ export const getAllTasksForDate = query(
 			},
 		});
 
-		return tasks.map((t) => ({
-			id: t.id,
-			title: t.title,
-			nextDueDate: t.nextDueDate,
-			intervalCount: t.intervalCount,
-			intervalType: t.intervalType,
-			completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
-		}));
+		return tasks
+			.toSorted(
+				makeMultiCriteriaSort(
+					(a, b) => {
+						const aIsForToday =
+							!a.nextDueDate.isAfter(data.now) || a.tasksCompleted.length > 0;
+						const bIsForToday =
+							!b.nextDueDate.isAfter(data.now) || b.tasksCompleted.length > 0;
+						if (!aIsForToday && !bIsForToday) {
+							if (a.nextDueDate.equals(b.nextDueDate)) return 0;
+							if (a.nextDueDate.isAfter(b.nextDueDate)) return 1;
+							return -1;
+						}
+						if (aIsForToday && !bIsForToday) return -1;
+						if (!aIsForToday && bIsForToday) return 1;
+
+						return 0;
+					},
+					(a, b) => a.intervalType.localeCompare(b.intervalType),
+					(a, b) => a.intervalCount - b.intervalCount,
+					(a, b) => a.title.localeCompare(b.title),
+				),
+			)
+			.map((t) => ({
+				id: t.id,
+				title: t.title,
+				nextDueDate: t.nextDueDate,
+				intervalCount: t.intervalCount,
+				intervalType: t.intervalType,
+				completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
+			}));
 	},
 );
 
