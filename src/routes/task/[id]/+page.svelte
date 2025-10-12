@@ -26,7 +26,7 @@
 		const last = completions[completions.length - 1];
 		const earliest = LocalDate.min(last.dueDate, last.completionDate);
 
-		const daysTotal = LocalDate.now().diffDays(earliest);
+		const daysTotal = LocalDate.now().diffDays(earliest) + 1;
 
 		return {
 			perWeek: (completions.length / daysTotal) * 7,
