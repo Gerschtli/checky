@@ -157,10 +157,36 @@
 			{@render taskBox(task)}
 		{/each}
 
-		<div class="divider text-base-content/60">Für spätere Tage</div>
+		{#if tasks.tomorrow.length}
+			<div class="divider text-base-content/60">Morgen</div>
 
-		{#each tasks.later as task (task.id)}
-			{@render taskBox(task)}
-		{/each}
+			{#each tasks.tomorrow as task (task.id)}
+				{@render taskBox(task)}
+			{/each}
+		{/if}
+
+		{#if tasks.thisWeek.length}
+			<div class="divider text-base-content/60">Diese Woche</div>
+
+			{#each tasks.thisWeek as task (task.id)}
+				{@render taskBox(task)}
+			{/each}
+		{/if}
+
+		{#if tasks.next7Days.length}
+			<div class="divider text-base-content/60">Nächste 7 Tage</div>
+
+			{#each tasks.next7Days as task (task.id)}
+				{@render taskBox(task)}
+			{/each}
+		{/if}
+
+		{#if tasks.later.length}
+			<div class="divider text-base-content/60">Später</div>
+
+			{#each tasks.later as task (task.id)}
+				{@render taskBox(task)}
+			{/each}
+		{/if}
 	</div>
 {/if}

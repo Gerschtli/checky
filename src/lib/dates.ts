@@ -79,6 +79,26 @@ export class LocalDate {
 		return this.date > localDate.date;
 	}
 
+	isBefore(localDate: LocalDate) {
+		return this.date < localDate.date;
+	}
+
+	getStartOfWeek() {
+		const day = this.date.getDay();
+
+		// Calculate the difference to get to Monday
+		// If it's Sunday (day === 0), we need to subtract 6 days.
+		// Otherwise, we subtract (day - 1).
+		// This can be simplified: day === 0 ? -6 : 1 - day
+		const diffToMonday = day === 0 ? -6 : 1 - day;
+
+		return this.addDays(diffToMonday);
+	}
+
+	isWithinSameWeek(localDate: LocalDate) {
+		return this.getStartOfWeek().equals(localDate.getStartOfWeek());
+	}
+
 	equals(localDate: LocalDate) {
 		return this.date.getTime() === localDate.date.getTime();
 	}

@@ -62,4 +62,44 @@ describe('LocalDate', () => {
 
 		expect(`${localDate}`).toBe('2025-09-25');
 	});
+
+	it('is within same week for same day', () => {
+		expect(
+			LocalDate.fromIsoString('2025-10-20').isWithinSameWeek(
+				LocalDate.fromIsoString('2025-10-20'),
+			),
+		).toBeTruthy();
+	});
+
+	it('is within same week for sunday and monday', () => {
+		expect(
+			LocalDate.fromIsoString('2025-10-26').isWithinSameWeek(
+				LocalDate.fromIsoString('2025-10-20'),
+			),
+		).toBeTruthy();
+	});
+
+	it('is within same week for monday and sunday', () => {
+		expect(
+			LocalDate.fromIsoString('2025-10-20').isWithinSameWeek(
+				LocalDate.fromIsoString('2025-10-26'),
+			),
+		).toBeTruthy();
+	});
+
+	it('is not within same week for sunday and monday', () => {
+		expect(
+			LocalDate.fromIsoString('2025-10-19').isWithinSameWeek(
+				LocalDate.fromIsoString('2025-10-26'),
+			),
+		).toBeFalsy();
+	});
+
+	it('is not within same week for monday and sunday', () => {
+		expect(
+			LocalDate.fromIsoString('2025-10-26').isWithinSameWeek(
+				LocalDate.fromIsoString('2025-10-19'),
+			),
+		).toBeFalsy();
+	});
 });

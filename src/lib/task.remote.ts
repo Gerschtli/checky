@@ -231,6 +231,15 @@ function makeMultiCriteriaSort<T>(...criteria: ((a: T, b: T) => number)[]) {
 	};
 }
 
+type TaskItem = {
+	id: number;
+	title: string;
+	nextDueDate: LocalDate;
+	intervalCount: number;
+	intervalType: 'days' | 'months';
+	completed: boolean;
+};
+
 export const getAllTasksForDate = query(
 	z.object({
 		now: instanceOfLocalDate(),
@@ -280,31 +289,26 @@ export const getAllTasksForDate = query(
 			}))
 			.reduce(
 				(agg, current) => {
-					if (current.nextDueDate.isAfter(data.now) && !current.completed) {
-						agg.later.push(current);
-					} else {
+					if (!current.nextDueDate.isAfter(data.now) || current.completed) {
 						agg.now.push(current);
+					} else if (current.nextDueDate.equals(data.now.addDays(1))) {
+						agg.tomorrow.push(current);
+					} else if (current.nextDueDate.isWithinSameWeek(data.now)) {
+						agg.thisWeek.push(current);
+					} else if (current.nextDueDate.isBefore(data.now.addDays(8))) {
+						agg.next7Days.push(current);
+					} else {
+						agg.later.push(current);
 					}
 
 					return agg;
 				},
 				{
-					now: [] as {
-						id: number;
-						title: string;
-						nextDueDate: LocalDate;
-						intervalCount: number;
-						intervalType: 'days' | 'months';
-						completed: boolean;
-					}[],
-					later: [] as {
-						id: number;
-						title: string;
-						nextDueDate: LocalDate;
-						intervalCount: number;
-						intervalType: 'days' | 'months';
-						completed: boolean;
-					}[],
+					now: [] as TaskItem[],
+					tomorrow: [] as TaskItem[],
+					thisWeek: [] as TaskItem[],
+					next7Days: [] as TaskItem[],
+					later: [] as TaskItem[],
 				},
 			);
 	},
