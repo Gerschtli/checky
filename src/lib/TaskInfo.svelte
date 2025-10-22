@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { Repeat } from 'lucide-svelte';
+	import { Calendar, Repeat } from 'lucide-svelte';
 
 	import { LocalDate } from './dates';
 
 	interface Props {
 		now?: LocalDate;
+		info?: true;
 		task: {
 			completed?: boolean;
 			nextDueDate: LocalDate;
@@ -13,7 +14,7 @@
 		};
 	}
 
-	const { now, task }: Props = $props();
+	const { now, info, task }: Props = $props();
 
 	const dueInDays = $derived(task.nextDueDate.diffDays(now ?? LocalDate.now()));
 </script>
@@ -24,6 +25,12 @@
 		task.completed ? 'text-base-content/40' : 'text-base-content/50',
 	]}
 >
+	<div class={{ 'hidden sm:contents': !info, contents: info }}>
+		<Calendar class="size-4 me-1" />
+		<div class="text-nowrap">{task.nextDueDate.format('medium')}</div>
+		<div class="mx-2">•</div>
+	</div>
+
 	<Repeat class="size-4 me-1" />
 	<div class="text-nowrap">
 		{#if task.intervalType === 'days' && task.intervalCount % 7 !== 0}

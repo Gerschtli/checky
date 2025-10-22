@@ -44,7 +44,7 @@
 <div class="flex flex-col gap-1">
 	<h1 class="text-xl font-bold">{task.title}</h1>
 
-	<TaskInfo {task} />
+	<TaskInfo {task} info />
 </div>
 
 <h2 class="font-bold text-lg mt-8 mb-2">Ausführungen</h2>
