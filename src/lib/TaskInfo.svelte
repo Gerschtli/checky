@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Calendar } from 'lucide-svelte';
+	import { Repeat } from 'lucide-svelte';
 
 	import { LocalDate } from './dates';
 
@@ -24,17 +24,20 @@
 		task.completed ? 'text-base-content/40' : 'text-base-content/50',
 	]}
 >
-	<Calendar class="size-4 me-1" />
-	<div class="text-nowrap">{task.nextDueDate.format('medium')}</div>
-	<div class="mx-2">•</div>
+	<Repeat class="size-4 me-1" />
 	<div class="text-nowrap">
-		{#if task.intervalType === 'days'}
+		{#if task.intervalType === 'days' && task.intervalCount % 7 !== 0}
 			{#if task.intervalCount === 1}
 				Täglich
-			{:else if task.intervalCount === 7}
-				Wöchentlich
 			{:else}
 				Alle {task.intervalCount} Tage
+			{/if}
+		{:else if task.intervalType === 'days' && task.intervalCount % 7 === 0}
+			{@const intervalCount = task.intervalCount / 7}
+			{#if intervalCount === 1}
+				Wöchentlich
+			{:else}
+				Alle {intervalCount} Wochen
 			{/if}
 		{:else if task.intervalType === 'months'}
 			{#if task.intervalCount === 1}
