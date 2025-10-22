@@ -4,6 +4,8 @@
 		CircleCheck,
 		CirclePause,
 		EllipsisVertical,
+		Eye,
+		EyeOff,
 		Pencil,
 		TriangleAlert,
 	} from 'lucide-svelte';
@@ -25,6 +27,7 @@
 
 	let now = $state(LocalDate.now());
 	const timeTravel = $derived(!now.equals(LocalDate.now()));
+	let hideCompleted = $state(false);
 
 	const tasks = $derived(timeTravel ? await getAllTasksForDate({ now }) : await getAllTasks());
 
@@ -47,12 +50,19 @@
 			Du siehst die Übersicht vom
 			<strong class="text-nowrap">{now.format('long')}</strong>.
 		</span>
+
+		<button class="btn btn-outline btn-sm" onclick={() => (now = LocalDate.now())}>
+			Zu Heute
+		</button>
 	</div>
 {/if}
 
 <button class="btn btn-accent mb-4" onclick={() => (now = now.addDays(-1))}>Tag zurück</button>
 <button class="btn btn-accent mb-4" onclick={() => (now = now.addDays(1))} disabled={!timeTravel}>
 	Tag vor
+</button>
+<button class="btn btn-primary btn-soft mb-4" onclick={() => (hideCompleted = !hideCompleted)}>
+	{#if hideCompleted}<Eye />{:else}<EyeOff />{/if}
 </button>
 
 {#if dev}
@@ -71,6 +81,7 @@
 		class={[
 			'flex items-center gap-4 p-3 sm:p-4 border rounded-lg transition-all duration-200',
 			task.completed ? 'bg-base-300' : 'bg-base-100 hover:shadow-md',
+			task.completed && hideCompleted && 'hidden',
 		]}
 	>
 		<input
