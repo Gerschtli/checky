@@ -9,6 +9,10 @@
 			"groupSlug": "all-minor-patch",
 			"matchPackageNames": ["*"],
 			"matchUpdateTypes": ["minor", "patch"]
+		},
+		{
+			"matchDatasources": ["npm"],
+			"minimumReleaseAge": "14 days"
 		}
 	]
 }
