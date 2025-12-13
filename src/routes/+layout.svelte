@@ -10,8 +10,6 @@
 
 	import '../app.css';
 
-	const user = $derived(await getUserOptional());
-
 	let { children } = $props();
 
 	onNavigate((navigation) => {
@@ -47,7 +45,7 @@
 				<Plus />
 			</a>
 
-			{#if user}
+			{#if await getUserOptional()}
 				<form {...logout}>
 					<button class="btn btn-neutral btn-soft" aria-label="Ausloggen">
 						<LogOut class="text-neutral" />

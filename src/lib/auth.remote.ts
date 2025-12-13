@@ -1,5 +1,5 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { error, redirect } from '@sveltejs/kit';
+import { error, invalid, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
 
@@ -53,12 +53,12 @@ export const login = form(
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
-			error(400, { message: 'Incorrect username or password' });
+			invalid('Incorrect username or password');
 		}
 
 		const validPassword = verify(existingUser.passwordHash, password);
 		if (!validPassword) {
-			error(400, { message: 'Incorrect username or password' });
+			invalid('Incorrect username or password');
 		}
 
 		const sessionToken = auth.generateSessionToken();
