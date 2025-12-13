@@ -9,6 +9,7 @@
 		Pencil,
 		TriangleAlert,
 	} from 'lucide-svelte';
+	import { MediaQuery } from 'svelte/reactivity';
 
 	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';
@@ -38,6 +39,8 @@
 			await uncompleteTask({ id, completionDate: now });
 		}
 	}
+
+	const isLargeScreen = new MediaQuery('width >= 40rem');
 </script>
 
 {#if timeTravel}
@@ -116,40 +119,42 @@
 		</button>
 
 		<div
-			class="max-sm:flex max-sm:dropdown max-sm:dropdown-end max-sm:menu max-sm:w-52 max-sm:rounded-box max-sm:bg-base-100 max-sm:shadow-md max-sm:flex-col max-sm:gap-2 sm:flex sm:items-center sm:gap-1 sm:relative sm:bg-transparent sm:shrink-0"
-			popover
+			class="max-sm:dropdown max-sm:dropdown-end max-sm:menu max-sm:w-52 max-sm:rounded-box max-sm:bg-base-100 max-sm:shadow-md sm:relative sm:bg-transparent sm:shrink-0"
+			popover={isLargeScreen.current ? undefined : ''}
 			id="action-{task.id}"
 			style:position-anchor="--anchor-{task.id}"
 		>
-			<a
-				href={resolve('/edit/[id]', { id: `${task.id}` })}
-				class="max-sm:btn max-sm:btn-primary sm:p-2 sm:text-base-content/40 sm:hover:text-primary sm:rounded-full sm:hover:bg-gray-100"
-				title="Bearbeiten"
-			>
-				<Pencil class="size-5" />
-				<span class="sm:hidden">Bearbeiten</span>
-			</a>
-			<form {...pauseTask.for(`${task.id}`)} class="contents">
-				<input type="hidden" name="id" value={task.id} />
-				<input type="hidden" name="countDays" value={1} />
-				<button
-					class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
-					title="Pausieren"
+			<div class="flex sm:flex-row flex-col gap-2 sm:items-center sm:gap-1">
+				<a
+					href={resolve('/edit/[id]', { id: `${task.id}` })}
+					class="max-sm:btn max-sm:btn-primary sm:p-2 sm:text-base-content/40 sm:hover:text-primary sm:rounded-full sm:hover:bg-gray-100"
+					title="Bearbeiten"
 				>
-					<CirclePause class="size-5" />
-					<span class="sm:hidden">Pausieren</span>
-				</button>
-			</form>
-			<form {...archiveTask.for(`${task.id}`)} class="contents">
-				<input type="hidden" name="id" value={task.id} />
-				<button
-					class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"
-					title="Archivieren"
-				>
-					<Archive class="size-5" />
-					<span class="sm:hidden">Archivieren</span>
-				</button>
-			</form>
+					<Pencil class="size-5" />
+					<span class="sm:hidden">Bearbeiten</span>
+				</a>
+				<form {...pauseTask.for(`${task.id}`)} class="contents">
+					<input type="hidden" name="id" value={task.id} />
+					<input type="hidden" name="countDays" value={1} />
+					<button
+						class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
+						title="Pausieren"
+					>
+						<CirclePause class="size-5" />
+						<span class="sm:hidden">Pausieren</span>
+					</button>
+				</form>
+				<form {...archiveTask.for(`${task.id}`)} class="contents">
+					<input type="hidden" name="id" value={task.id} />
+					<button
+						class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"
+						title="Archivieren"
+					>
+						<Archive class="size-5" />
+						<span class="sm:hidden">Archivieren</span>
+					</button>
+				</form>
+			</div>
 		</div>
 	</div>
 {/snippet}
