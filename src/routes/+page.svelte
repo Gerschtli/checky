@@ -133,7 +133,7 @@
 					<Pencil class="size-5" />
 					<span class="sm:hidden">Bearbeiten</span>
 				</a>
-				<form {...pauseTask.for(`${task.id}`)} class="contents">
+				<form {...pauseTask.for(task.id)} class="contents">
 					<input type="hidden" name="id" value={task.id} />
 					<input type="hidden" name="countDays" value={1} />
 					<button
@@ -144,7 +144,7 @@
 						<span class="sm:hidden">Pausieren</span>
 					</button>
 				</form>
-				<form {...archiveTask.for(`${task.id}`)} class="contents">
+				<form {...archiveTask.for(task.id)} class="contents">
 					<input type="hidden" name="id" value={task.id} />
 					<button
 						class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"

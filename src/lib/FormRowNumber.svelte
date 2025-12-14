@@ -5,26 +5,24 @@
 		default?: number;
 		id: string;
 		label: string;
-		field: RemoteFormField<string>;
+		field: RemoteFormField<number>;
 	}
 
 	const { default: defaultValue, id, label, field }: Props = $props();
-	// FIXME: this should not be necessary
-	const fieldNumber = $derived(field as unknown as RemoteFormField<number>);
 
 	const errorId = $derived(`${id}-error`);
 
 	$effect(() => {
 		// FIXME: is there a better way without $effect?
-		if (defaultValue !== undefined) fieldNumber.set(defaultValue);
+		if (defaultValue !== undefined) field.set(defaultValue);
 	});
 </script>
 
 <div class="flex flex-col">
 	<label class="label" for={id}>{label}</label>
-	<input {id} class="input w-full" {...fieldNumber.as('number')} aria-errormessage={errorId} />
+	<input {id} class="input w-full" {...field.as('number')} aria-errormessage={errorId} />
 
-	{#each fieldNumber.issues() as issue, i (i)}
+	{#each field.issues() as issue, i (i)}
 		<small class="text-error" id={errorId}>
 			{issue.message}
 		</small>

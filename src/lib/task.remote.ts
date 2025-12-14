@@ -20,7 +20,7 @@ export const createTask = form(
 	z.object({
 		title: z.string().trim().min(1),
 		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalCount: z.coerce.number<string>().int().min(1),
+		intervalCount: z.number().int().min(1),
 		intervalType: z.enum(['days', 'months']),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
@@ -43,10 +43,10 @@ export const createTask = form(
 
 export const editTask = form(
 	z.object({
-		id: z.coerce.number<string>().int(),
+		id: z.number().int(),
 		title: z.string().trim().min(1),
 		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalCount: z.coerce.number<string>().int().min(1),
+		intervalCount: z.number().int().min(1),
 		intervalType: z.enum(['days', 'months']),
 		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
 	}),
@@ -165,7 +165,7 @@ export const uncompleteTask = command(
 
 export const archiveTask = form(
 	z.object({
-		id: z.coerce.number<string>().int(),
+		id: z.number().int(),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -185,8 +185,8 @@ export const archiveTask = form(
 
 export const pauseTask = form(
 	z.object({
-		id: z.coerce.number<string>().int(),
-		countDays: z.coerce.number<string>().int(),
+		id: z.number().int(),
+		countDays: z.number().int(),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
