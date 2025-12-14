@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
-import z from 'zod';
+import * as v from 'valibot';
 
 import { command, form, query } from '$app/server';
 
@@ -11,18 +11,23 @@ import { LocalDate } from './dates';
 import { db } from './server/db';
 
 function instanceOfLocalDate() {
-	return z.custom<LocalDate>((data) => data instanceof LocalDate, {
-		message: `Input not instance of LocalDate`,
-	});
+	return v.custom<LocalDate>(
+		(data) => data instanceof LocalDate,
+		`Input not instance of LocalDate`,
+	);
 }
 
 export const createTask = form(
-	z.object({
-		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalCount: z.number().int().min(1),
-		intervalType: z.enum(['days', 'months']),
-		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
+	v.object({
+		title: v.pipe(v.string(), v.trim(), v.minLength(1)),
+		nextDueDate: v.pipe(
+			v.string(),
+			v.isoDate(),
+			v.transform((d) => LocalDate.fromIsoString(d)),
+		),
+		intervalCount: v.pipe(v.number(), v.integer(), v.minValue(1)),
+		intervalType: v.picklist(['days', 'months']),
+		repeatMode: v.picklist(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -42,13 +47,17 @@ export const createTask = form(
 );
 
 export const editTask = form(
-	z.object({
-		id: z.number().int(),
-		title: z.string().trim().min(1),
-		nextDueDate: z.iso.date().transform((d) => LocalDate.fromIsoString(d)),
-		intervalCount: z.number().int().min(1),
-		intervalType: z.enum(['days', 'months']),
-		repeatMode: z.enum(['fromDueDate', 'fromCompletionDate']),
+	v.object({
+		id: v.pipe(v.number(), v.integer()),
+		title: v.pipe(v.string(), v.trim(), v.minLength(1)),
+		nextDueDate: v.pipe(
+			v.string(),
+			v.isoDate(),
+			v.transform((d) => LocalDate.fromIsoString(d)),
+		),
+		intervalCount: v.pipe(v.number(), v.integer(), v.minValue(1)),
+		intervalType: v.picklist(['days', 'months']),
+		repeatMode: v.picklist(['fromDueDate', 'fromCompletionDate']),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -73,8 +82,8 @@ export const editTask = form(
 );
 
 export const completeTask = command(
-	z.object({
-		id: z.int(),
+	v.object({
+		id: v.pipe(v.number(), v.integer()),
 		completionDate: instanceOfLocalDate(),
 	}),
 	async (data) => {
@@ -127,8 +136,8 @@ function calculateNextDueDate(
 }
 
 export const uncompleteTask = command(
-	z.object({
-		id: z.int(),
+	v.object({
+		id: v.pipe(v.number(), v.integer()),
 		completionDate: instanceOfLocalDate(),
 	}),
 	async (data) => {
@@ -164,8 +173,8 @@ export const uncompleteTask = command(
 );
 
 export const archiveTask = form(
-	z.object({
-		id: z.number().int(),
+	v.object({
+		id: v.pipe(v.number(), v.integer()),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -184,9 +193,9 @@ export const archiveTask = form(
 );
 
 export const pauseTask = form(
-	z.object({
-		id: z.number().int(),
-		countDays: z.number().int(),
+	v.object({
+		id: v.pipe(v.number(), v.integer()),
+		countDays: v.pipe(v.number(), v.integer()),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
@@ -203,7 +212,7 @@ export const pauseTask = form(
 	},
 );
 
-export const getTaskById = query(z.int(), async (id) => {
+export const getTaskById = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
 
 	const task = await db.query.tasks.findFirst({
@@ -241,7 +250,7 @@ type TaskItem = {
 };
 
 export const getAllTasksForDate = query(
-	z.object({
+	v.object({
 		now: instanceOfLocalDate(),
 	}),
 	async (data) => {
@@ -314,7 +323,7 @@ export const getAllTasksForDate = query(
 	},
 );
 
-export const getTaskCompletions = query(z.int(), async (id) => {
+export const getTaskCompletions = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
 
 	const completions = await db.query.tasksCompleted.findMany({

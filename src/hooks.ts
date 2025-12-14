@@ -1,11 +1,10 @@
 import type { Transport } from '@sveltejs/kit';
-import z from 'zod';
+import '@valibot/i18n/de';
+import * as v from 'valibot';
 
 import { LocalDate } from '$lib/dates';
 
-export function init() {
-	z.config(z.locales.de());
-}
+v.setGlobalConfig({ lang: 'de' });
 
 export const transport: Transport = {
 	LocalDate: {

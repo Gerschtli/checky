@@ -1,7 +1,7 @@
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { error, invalid, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import z from 'zod';
+import * as v from 'valibot';
 
 import { resolve } from '$app/paths';
 import { form, getRequestEvent, query } from '$app/server';
@@ -41,9 +41,9 @@ export const getUserOptional = query(async () => {
 });
 
 export const login = form(
-	z.object({
-		username: z.string().min(3),
-		_password: z.string().min(6),
+	v.object({
+		username: v.pipe(v.string(), v.minLength(3)),
+		_password: v.pipe(v.string(), v.minLength(6)),
 	}),
 	async ({ username, _password: password }) => {
 		const results = await db
@@ -73,9 +73,9 @@ export const login = form(
 );
 
 export const register = form(
-	z.object({
-		username: z.string().min(3),
-		_password: z.string().min(6),
+	v.object({
+		username: v.pipe(v.string(), v.minLength(3)),
+		_password: v.pipe(v.string(), v.minLength(6)),
 	}),
 	async ({ username, _password: password }) => {
 		const userId = generateUserId();
