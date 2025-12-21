@@ -48,7 +48,7 @@ export const createTask = form(
 
 export const editTask = form(
 	v.object({
-		id: v.pipe(v.number(), v.integer()),
+		id: v.pipe(v.string(), v.toNumber(), v.integer()),
 		title: v.pipe(v.string(), v.trim(), v.minLength(1)),
 		nextDueDate: v.pipe(
 			v.string(),
@@ -174,7 +174,7 @@ export const uncompleteTask = command(
 
 export const archiveTask = form(
 	v.object({
-		id: v.pipe(v.number(), v.integer()),
+		id: v.pipe(v.string(), v.toNumber(), v.integer()),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -194,8 +194,8 @@ export const archiveTask = form(
 
 export const pauseTask = form(
 	v.object({
-		id: v.pipe(v.number(), v.integer()),
-		countDays: v.pipe(v.number(), v.integer()),
+		id: v.pipe(v.string(), v.toNumber(), v.integer()),
+		countDays: v.pipe(v.string(), v.toNumber(), v.integer()),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);

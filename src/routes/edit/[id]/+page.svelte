@@ -12,9 +12,7 @@
 <h1 class="text-xl font-bold">Aufgabe bearbeiten</h1>
 
 <form {...editTask} oninput={() => editTask.validate()} class="flex flex-col gap-2">
-	<!-- FIXME: This should be possible with .as(...) -->
-	<input type="hidden" name="id" value={task.id} />
-	<!-- <input {...editTask.fields.id.as('hidden', task.id)} /> -->
+	<input {...editTask.fields.id.as('hidden', `${task.id}`)} />
 
 	<FormRow
 		type="text"

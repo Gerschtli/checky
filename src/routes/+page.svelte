@@ -80,6 +80,8 @@
 	intervalType: 'days' | 'months';
 	completed: boolean;
 })}
+	{@const archiveTaskFor = archiveTask.for(`${task.id}`)}
+	{@const pauseTaskFor = pauseTask.for(`${task.id}`)}
 	<div
 		class={[
 			'flex items-center gap-4 p-3 sm:p-4 border rounded-lg transition-all duration-200',
@@ -133,9 +135,9 @@
 					<Pencil class="size-5" />
 					<span class="sm:hidden">Bearbeiten</span>
 				</a>
-				<form {...pauseTask.for(task.id)} class="contents">
-					<input type="hidden" name="id" value={task.id} />
-					<input type="hidden" name="countDays" value={1} />
+				<form {...pauseTaskFor} class="contents">
+					<input {...pauseTaskFor.fields.id.as('hidden', `${task.id}`)} />
+					<input {...pauseTaskFor.fields.countDays.as('hidden', '1')} />
 					<button
 						class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
 						title="Pausieren"
@@ -144,8 +146,8 @@
 						<span class="sm:hidden">Pausieren</span>
 					</button>
 				</form>
-				<form {...archiveTask.for(task.id)} class="contents">
-					<input type="hidden" name="id" value={task.id} />
+				<form {...archiveTaskFor} class="contents">
+					<input {...archiveTaskFor.fields.id.as('hidden', `${task.id}`)} />
 					<button
 						class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"
 						title="Archivieren"
