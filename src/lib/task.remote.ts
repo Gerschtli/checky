@@ -200,6 +200,13 @@ export const pauseTask = form(
 	async (data) => {
 		const task = await getTaskById(data.id);
 
+		if (task.repeatMode === 'fromDueDate') {
+			error(
+				400,
+				'Aufgaben mit Wiederholung ab Fälligkeitsdatum können nicht pausiert werden',
+			);
+		}
+
 		await db
 			.update(table.tasks)
 			.set({
