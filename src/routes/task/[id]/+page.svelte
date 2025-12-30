@@ -5,10 +5,10 @@
 	import { LocalDate } from '$lib/dates';
 	import { getTaskById, getTaskCompletions } from '$lib/task.remote';
 
-	const taskId = $derived(parseInt(page.params.id!));
+	const paramId = $derived(page.params.id!);
+	const taskId = $derived(parseInt(paramId));
 	const task = $derived(await getTaskById(taskId));
-
-	const completions = $derived(getTaskCompletions(taskId));
+	const completions = $derived(await getTaskCompletions(taskId));
 
 	function averageDays(
 		completions: {
@@ -39,6 +39,8 @@
 			maximumFractionDigits: 2,
 		}).format(n);
 	}
+
+	const average = $derived(averageDays(completions));
 </script>
 
 <div class="flex flex-col gap-1">
@@ -49,23 +51,17 @@
 
 <h2 class="font-bold text-lg mt-8 mb-2">Ausführungen</h2>
 
-{#if completions.current}
-	{@const average = averageDays(completions.current)}
+<p class="mb-2">
+	Durchschnitt:
+	{formatNumber(average.perWeek)} mal pro Woche / alle {formatNumber(average.everyNDays)} Tage
+</p>
 
-	<p class="mb-2">
-		Durchschnitt:
-		{formatNumber(average.perWeek)} mal pro Woche / alle {formatNumber(average.everyNDays)} Tage
-	</p>
-
-	<ol class="list-decimal ps-6 text-sm">
-		{#each completions.current as completion (completion.id)}
-			<li>
-				{completion.completionDate.format('long')} (Fällig am {completion.dueDate.format(
-					'medium',
-				)})
-			</li>
-		{/each}
-	</ol>
-{:else if completions.loading}
-	<span class="loading loading-dots loading-md"></span>
-{/if}
+<ol class="list-decimal ps-6 text-sm">
+	{#each completions as completion (completion.id)}
+		<li>
+			{completion.completionDate.format('long')} (Fällig am {completion.dueDate.format(
+				'medium',
+			)})
+		</li>
+	{/each}
+</ol>
