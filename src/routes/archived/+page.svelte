@@ -28,7 +28,6 @@
 		icon={Archive}
 		title="Keine archivierten Aufgaben"
 		description="Archivierte Aufgaben werden hier angezeigt. Du kannst sie jederzeit reaktivieren."
-		size="lg"
 	/>
 {:else}
 	<div class="space-y-3">
