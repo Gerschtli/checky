@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 import * as v from 'valibot';
 
 import { command, form, query } from '$app/server';
@@ -163,6 +163,9 @@ export const editTask = form(
 				});
 			}
 		}
+
+		// Clean up orphaned tags after task editing
+		await cleanupOrphanedTags();
 
 		await getTaskById(data.id).refresh();
 
@@ -550,9 +553,38 @@ export const deleteTask = form(
 			error(404, 'Aufgabe nicht gefunden');
 		}
 
+		// Clean up orphaned tags after task deletion
+		await cleanupOrphanedTags();
+
 		await getArchivedTasks().refresh();
+		await getAllTasks().refresh();
 	},
 );
+
+export const cleanupOrphanedTags = command(async () => {
+	const user = await getUser();
+
+	// Find all tags for the user that are not associated with any tasks
+	const orphanedTags = await db.query.tags.findMany({
+		where: eq(table.tags.userId, user.id),
+		with: {
+			taskTags: true,
+		},
+	});
+
+	// Filter to only tags with no task associations
+	const tagsToDelete = orphanedTags
+		.filter((tag) => tag.taskTags.length === 0)
+		.map((tag) => tag.id);
+
+	if (tagsToDelete.length > 0) {
+		// Delete the orphaned tags
+		await db.delete(table.tags).where(inArray(table.tags.id, tagsToDelete));
+	}
+
+	// Refresh tag queries
+	await getAllTags().refresh();
+});
 
 export const getTaskCompletions = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
