@@ -482,6 +482,52 @@ export const getAllTasksForDate = query(
 	},
 );
 
+export const getArchivedTasks = query(async () => {
+	const user = await getUser();
+
+	const tasks = await db.query.tasks.findMany({
+		where: and(eq(table.tasks.archived, true), eq(table.tasks.userId, user.id)),
+		with: {
+			taskTags: {
+				with: {
+					tag: true,
+				},
+			},
+		},
+		orderBy: [desc(table.tasks.archivedAt)],
+	});
+
+	return tasks.map((t) => ({
+		id: t.id,
+		title: t.title,
+		nextDueDate: t.nextDueDate,
+		intervalCount: t.intervalCount,
+		intervalType: t.intervalType,
+		archivedAt: t.archivedAt,
+		tags: t.taskTags.map((tt) => tt.tag.name),
+	}));
+});
+
+export const reactivateTask = form(
+	v.object({
+		id: v.pipe(v.string(), v.toNumber(), v.integer()),
+	}),
+	async (data) => {
+		const user = await getUser();
+
+		await db
+			.update(table.tasks)
+			.set({
+				archived: false,
+				archivedAt: null,
+			})
+			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
+
+		await getArchivedTasks().refresh();
+		await getAllTasks().refresh();
+	},
+);
+
 export const getTaskCompletions = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
 

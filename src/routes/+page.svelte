@@ -1,26 +1,16 @@
 <script lang="ts">
-	import {
-		Archive,
-		CircleCheck,
-		CirclePause,
-		EllipsisVertical,
-		Eye,
-		EyeOff,
-		Pencil,
-		TriangleAlert,
-	} from 'lucide-svelte';
-	import { MediaQuery } from 'svelte/reactivity';
+	import { Archive, CircleCheck, CirclePause, Eye, EyeOff, TriangleAlert } from 'lucide-svelte';
 
 	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';
 
+	import EmptyState from '$lib/EmptyState.svelte';
 	import FormRowNumber from '$lib/FormRowNumber.svelte';
 	import FormRowSelect from '$lib/FormRowSelect.svelte';
-	import TaskInfo from '$lib/TaskInfo.svelte';
+	import TaskCard from '$lib/TaskCard.svelte';
 	import { LocalDate } from '$lib/dates';
 	import { initData } from '$lib/init.remote';
 	import {
-		archiveTask,
 		completeTask,
 		getAllTags,
 		getAllTasks,
@@ -46,8 +36,6 @@
 			await uncompleteTask({ id, completionDate: now });
 		}
 	}
-
-	const isLargeScreen = new MediaQuery('width >= 40rem');
 </script>
 
 {#if timeTravel}
@@ -78,119 +66,46 @@
 	<CirclePause class="size-4" />
 	Alle mit Tag pausieren
 </button>
+<a href={resolve('/archived')} class="btn btn-secondary mb-4">
+	<Archive class="size-4" />
+	Archiv
+</a>
 
 {#if dev}
 	<button class="btn btn-warning mb-4" onclick={() => initData()}>Testdaten generieren</button>
 {/if}
 
-{#snippet taskBox(task: {
-	id: number;
-	title: string;
-	nextDueDate: LocalDate;
-	intervalCount: number;
-	intervalType: 'days' | 'months';
-	completed: boolean;
-})}
-	{@const archiveTaskFor = archiveTask.for(`${task.id}`)}
-	<div
-		class={[
-			'flex items-center gap-4 p-3 sm:p-4 border rounded-lg transition-all duration-200',
-			task.completed ? 'bg-base-300' : 'bg-base-100 hover:shadow-md',
-			task.completed && hideCompleted && 'hidden',
-		]}
-	>
-		<input
-			type="checkbox"
-			name="complete"
-			class="checkbox checkbox-md shrink-0"
-			bind:checked={task.completed}
-			onchange={async (e) => await onTaskCheckboxChange(task.id, e.currentTarget.checked)}
-		/>
-
-		<div class="flex flex-col gap-1 grow">
-			<a
-				href={resolve('/task/[id]', { id: `${task.id}` })}
-				class={[
-					'font-semibold',
-					task.completed ? 'line-through text-base-content/50' : 'text-base-content',
-				]}
-			>
-				{task.title}
-			</a>
-
-			<TaskInfo {now} {task} />
-		</div>
-
-		<button
-			class="sm:hidden p-2 text-base-content/40 hover:text-primary rounded-full hover:bg-gray-100"
-			popovertarget="action-{task.id}"
-			style:anchor-name="--anchor-{task.id}"
-			title="Optionen"
-		>
-			<EllipsisVertical />
-		</button>
-
-		<div
-			class="max-sm:dropdown max-sm:dropdown-end max-sm:menu max-sm:w-52 max-sm:rounded-box max-sm:bg-base-100 max-sm:shadow-md sm:relative sm:bg-transparent sm:shrink-0"
-			popover={isLargeScreen.current ? undefined : ''}
-			id="action-{task.id}"
-			style:position-anchor="--anchor-{task.id}"
-		>
-			<div class="flex sm:flex-row flex-col gap-2 sm:items-center sm:gap-1">
-				<a
-					href={resolve('/edit/[id]', { id: `${task.id}` })}
-					class="max-sm:btn max-sm:btn-primary sm:p-2 sm:text-base-content/40 sm:hover:text-primary sm:rounded-full sm:hover:bg-gray-100"
-					title="Bearbeiten"
-				>
-					<Pencil class="size-5" />
-					<span class="sm:hidden">Bearbeiten</span>
-				</a>
-				<button
-					class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
-					title="Pausieren"
-					onclick={() => {
-						pauseTaskId = task.id;
-						document.getElementById(`action-${task.id}`)?.hidePopover();
-					}}
-				>
-					<CirclePause class="size-5" />
-					<span class="sm:hidden">Pausieren</span>
-				</button>
-				<form {...archiveTaskFor} class="contents">
-					<input {...archiveTaskFor.fields.id.as('hidden', `${task.id}`)} />
-					<button
-						class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"
-						title="Archivieren"
-						onclick={() => document.getElementById(`action-${task.id}`)?.hidePopover()}
-					>
-						<Archive class="size-5" />
-						<span class="sm:hidden">Archivieren</span>
-					</button>
-				</form>
-			</div>
-		</div>
-	</div>
-{/snippet}
-
 {#if tasks.now.length === 0 && tasks.later.length === 0}
-	<div class="flex flex-col items-center py-8">
-		<CircleCheck strokeWidth={1} size={32} class="text-base-content/50" />
-		<h3 class="mt-4 text-sm font-medium text-base-content">Keine Aufgaben</h3>
-		<p class="mt-1 text-sm text-base-content/50">
-			Beginne, indem du eine neue Aufgabe erstellst.
-		</p>
-	</div>
+	<EmptyState
+		icon={CircleCheck}
+		title="Keine Aufgaben"
+		description="Beginne, indem du eine neue Aufgabe erstellst."
+	/>
 {:else}
 	<div class="flex gap-4 flex-col">
 		{#each tasks.now as task (task.id)}
-			{@render taskBox(task)}
+			<TaskCard
+				{now}
+				{task}
+				mode="active"
+				{hideCompleted}
+				onPause={(id) => (pauseTaskId = id)}
+				onCheckboxChange={onTaskCheckboxChange}
+			/>
 		{/each}
 
 		{#if tasks.tomorrow.length}
 			<div class="divider text-base-content/60">Morgen</div>
 
 			{#each tasks.tomorrow as task (task.id)}
-				{@render taskBox(task)}
+				<TaskCard
+					{now}
+					{task}
+					mode="active"
+					{hideCompleted}
+					onPause={(id) => (pauseTaskId = id)}
+					onCheckboxChange={onTaskCheckboxChange}
+				/>
 			{/each}
 		{/if}
 
@@ -198,7 +113,14 @@
 			<div class="divider text-base-content/60">Diese Woche</div>
 
 			{#each tasks.thisWeek as task (task.id)}
-				{@render taskBox(task)}
+				<TaskCard
+					{now}
+					{task}
+					mode="active"
+					{hideCompleted}
+					onPause={(id) => (pauseTaskId = id)}
+					onCheckboxChange={onTaskCheckboxChange}
+				/>
 			{/each}
 		{/if}
 
@@ -206,7 +128,14 @@
 			<div class="divider text-base-content/60">Nächste 7 Tage</div>
 
 			{#each tasks.next7Days as task (task.id)}
-				{@render taskBox(task)}
+				<TaskCard
+					{now}
+					{task}
+					mode="active"
+					{hideCompleted}
+					onPause={(id) => (pauseTaskId = id)}
+					onCheckboxChange={onTaskCheckboxChange}
+				/>
 			{/each}
 		{/if}
 
@@ -214,7 +143,14 @@
 			<div class="divider text-base-content/60">Später</div>
 
 			{#each tasks.later as task (task.id)}
-				{@render taskBox(task)}
+				<TaskCard
+					{now}
+					{task}
+					mode="active"
+					{hideCompleted}
+					onPause={(id) => (pauseTaskId = id)}
+					onCheckboxChange={onTaskCheckboxChange}
+				/>
 			{/each}
 		{/if}
 	</div>
