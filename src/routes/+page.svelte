@@ -14,6 +14,7 @@
 	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';
 
+	import FormRowNumber from '$lib/FormRowNumber.svelte';
 	import TaskInfo from '$lib/TaskInfo.svelte';
 	import { LocalDate } from '$lib/dates';
 	import { initData } from '$lib/init.remote';
@@ -29,6 +30,7 @@
 	let now = $state(LocalDate.now());
 	const timeTravel = $derived(!now.equals(LocalDate.now()));
 	let hideCompleted = $state(false);
+	let pauseTaskId = $state<number | null>(null);
 
 	const tasks = $derived(timeTravel ? await getAllTasksForDate({ now }) : await getAllTasks());
 
@@ -81,7 +83,6 @@
 	completed: boolean;
 })}
 	{@const archiveTaskFor = archiveTask.for(`${task.id}`)}
-	{@const pauseTaskFor = pauseTask.for(`${task.id}`)}
 	<div
 		class={[
 			'flex items-center gap-4 p-3 sm:p-4 border rounded-lg transition-all duration-200',
@@ -135,22 +136,23 @@
 					<Pencil class="size-5" />
 					<span class="sm:hidden">Bearbeiten</span>
 				</a>
-				<form {...pauseTaskFor} class="contents">
-					<input {...pauseTaskFor.fields.id.as('hidden', `${task.id}`)} />
-					<input {...pauseTaskFor.fields.countDays.as('hidden', '1')} />
-					<button
-						class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
-						title="Pausieren"
-					>
-						<CirclePause class="size-5" />
-						<span class="sm:hidden">Pausieren</span>
-					</button>
-				</form>
+				<button
+					class="max-sm:btn max-sm:btn-warning sm:p-2 sm:text-base-content/40 sm:hover:text-warning sm:rounded-full sm:hover:bg-gray-100"
+					title="Pausieren"
+					onclick={() => {
+						pauseTaskId = task.id;
+						document.getElementById(`action-${task.id}`)?.hidePopover();
+					}}
+				>
+					<CirclePause class="size-5" />
+					<span class="sm:hidden">Pausieren</span>
+				</button>
 				<form {...archiveTaskFor} class="contents">
 					<input {...archiveTaskFor.fields.id.as('hidden', `${task.id}`)} />
 					<button
 						class="max-sm:btn max-sm:btn-error sm:p-2 sm:text-base-content/40 sm:hover:text-error sm:rounded-full sm:hover:bg-gray-100"
 						title="Archivieren"
+						onclick={() => document.getElementById(`action-${task.id}`)?.hidePopover()}
 					>
 						<Archive class="size-5" />
 						<span class="sm:hidden">Archivieren</span>
@@ -208,3 +210,28 @@
 		{/if}
 	</div>
 {/if}
+
+<dialog
+	class="modal"
+	onclick={(e) => {
+		if (e.target === e.currentTarget) pauseTaskId = null;
+	}}
+	onsubmit={() => (pauseTaskId = null)}
+	open={pauseTaskId !== null}
+>
+	<div class="modal-box">
+		<h3 class="font-bold text-lg">Aufgabe pausieren</h3>
+		<p class="py-4">Wie viele Tage soll die Aufgabe pausiert werden?</p>
+		<form {...pauseTask} oninput={() => pauseTask.validate()} class="flex flex-col gap-4">
+			<input {...pauseTask.fields.id.as('hidden', `${pauseTaskId}`)} />
+			<FormRowNumber id="countDays" label="Anzahl Tage" field={pauseTask.fields.countDays} />
+
+			<div class="modal-action">
+				<button type="button" class="btn" onclick={() => (pauseTaskId = null)}>
+					Abbrechen
+				</button>
+				<button type="submit" class="btn btn-warning">Pausieren</button>
+			</div>
+		</form>
+	</div>
+</dialog>

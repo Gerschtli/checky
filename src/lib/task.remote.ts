@@ -284,7 +284,7 @@ export const archiveTask = form(
 export const pauseTask = form(
 	v.object({
 		id: v.pipe(v.string(), v.toNumber(), v.integer()),
-		countDays: v.pipe(v.string(), v.toNumber(), v.integer()),
+		countDays: v.pipe(v.number(), v.integer(), v.minValue(1)),
 	}),
 	async (data) => {
 		const task = await getTaskById(data.id);
