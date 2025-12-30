@@ -1,12 +1,19 @@
 <script lang="ts">
-	import { Archive, CirclePause, EllipsisVertical, Pencil, RotateCcw } from 'lucide-svelte';
+	import {
+		Archive,
+		CirclePause,
+		EllipsisVertical,
+		Pencil,
+		RotateCcw,
+		Trash2,
+	} from 'lucide-svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 
 	import { resolve } from '$app/paths';
 
 	import TaskInfo from '$lib/TaskInfo.svelte';
 	import { LocalDate } from '$lib/dates';
-	import { archiveTask, reactivateTask } from '$lib/task.remote';
+	import { archiveTask, deleteTask, reactivateTask } from '$lib/task.remote';
 
 	interface Props {
 		now: LocalDate;
@@ -140,12 +147,33 @@
 			</div>
 		</div>
 	{:else if mode === 'archived'}
-		<form {...reactivateTask.for(`${task.id}`)} class="shrink-0">
-			<input {...reactivateTask.for(`${task.id}`).fields.id.as('hidden', `${task.id}`)} />
-			<button class="btn btn-primary btn-sm" title="Reaktivieren">
-				<RotateCcw class="size-4" />
-				Reaktivieren
-			</button>
-		</form>
+		<div class="flex gap-2 shrink-0">
+			<form {...reactivateTask.for(`${task.id}`)} class="contents">
+				<input {...reactivateTask.for(`${task.id}`).fields.id.as('hidden', `${task.id}`)} />
+				<button class="btn btn-primary btn-sm" title="Reaktivieren">
+					<RotateCcw class="size-4" />
+					<span class="hidden sm:inline">Reaktivieren</span>
+				</button>
+			</form>
+			<form {...deleteTask.for(`${task.id}`)} class="contents">
+				<input {...deleteTask.for(`${task.id}`).fields.id.as('hidden', `${task.id}`)} />
+				<button
+					class="btn btn-error btn-sm"
+					title="Löschen"
+					onclick={(e) => {
+						if (
+							!confirm(
+								'Aufgabe wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+							)
+						) {
+							e.preventDefault();
+						}
+					}}
+				>
+					<Trash2 class="size-4" />
+					<span class="hidden sm:inline">Löschen</span>
+				</button>
+			</form>
+		</div>
 	{/if}
 </div>

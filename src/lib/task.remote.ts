@@ -528,6 +528,32 @@ export const reactivateTask = form(
 	},
 );
 
+export const deleteTask = form(
+	v.object({
+		id: v.pipe(v.string(), v.toNumber(), v.integer()),
+	}),
+	async (data) => {
+		const user = await getUser();
+
+		// Delete task completions first (due to foreign key constraints)
+		await db.delete(table.tasksCompleted).where(eq(table.tasksCompleted.taskId, data.id));
+
+		// Delete task-tag associations
+		await db.delete(table.taskTags).where(eq(table.taskTags.taskId, data.id));
+
+		// Delete the task
+		const result = await db
+			.delete(table.tasks)
+			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
+
+		if (result.rowsAffected === 0) {
+			error(404, 'Aufgabe nicht gefunden');
+		}
+
+		await getArchivedTasks().refresh();
+	},
+);
+
 export const getTaskCompletions = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
 
