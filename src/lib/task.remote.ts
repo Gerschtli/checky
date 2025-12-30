@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import * as v from 'valibot';
 
 import { command, form, query } from '$app/server';
@@ -308,6 +308,52 @@ export const pauseTask = form(
 	},
 );
 
+export const pauseTasksByTag = form(
+	v.object({
+		tagName: v.pipe(v.string(), v.trim(), v.minLength(1)),
+		countDays: v.pipe(v.number(), v.integer(), v.minValue(1)),
+	}),
+	async (data) => {
+		const user = await getUser();
+
+		// Find the tag
+		const tag = await db.query.tags.findFirst({
+			where: and(eq(table.tags.name, data.tagName), eq(table.tags.userId, user.id)),
+		});
+
+		if (!tag) error(400, 'Tag nicht gefunden');
+
+		// Find all tasks with this tag that can be paused
+		const tasks = await db.query.tasks.findMany({
+			where: and(
+				eq(table.tasks.userId, user.id),
+				eq(table.tasks.archived, false),
+				eq(table.tasks.repeatMode, 'fromCompletionDate'),
+			),
+			with: {
+				taskTags: {
+					where: eq(table.taskTags.tagId, tag.id),
+				},
+			},
+		});
+
+		// Filter tasks that have the tag
+		const tasksToPause = tasks.filter((task) => task.taskTags.length > 0);
+
+		// Update each task
+		for (const task of tasksToPause) {
+			await db
+				.update(table.tasks)
+				.set({
+					nextDueDate: task.nextDueDate.addDays(data.countDays),
+				})
+				.where(eq(table.tasks.id, task.id));
+		}
+
+		await getAllTasks().refresh();
+	},
+);
+
 export const getTaskById = query(v.pipe(v.number(), v.integer()), async (id) => {
 	const user = await getUser();
 
@@ -445,4 +491,15 @@ export const getTaskCompletions = query(v.pipe(v.number(), v.integer()), async (
 	});
 
 	return completions;
+});
+
+export const getAllTags = query(async () => {
+	const user = await getUser();
+
+	const tags = await db.query.tags.findMany({
+		where: eq(table.tags.userId, user.id),
+		orderBy: asc(table.tags.name),
+	});
+
+	return tags;
 });

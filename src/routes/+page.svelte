@@ -15,15 +15,18 @@
 	import { resolve } from '$app/paths';
 
 	import FormRowNumber from '$lib/FormRowNumber.svelte';
+	import FormRowSelect from '$lib/FormRowSelect.svelte';
 	import TaskInfo from '$lib/TaskInfo.svelte';
 	import { LocalDate } from '$lib/dates';
 	import { initData } from '$lib/init.remote';
 	import {
 		archiveTask,
 		completeTask,
+		getAllTags,
 		getAllTasks,
 		getAllTasksForDate,
 		pauseTask,
+		pauseTasksByTag,
 		uncompleteTask,
 	} from '$lib/task.remote';
 
@@ -31,8 +34,10 @@
 	const timeTravel = $derived(!now.equals(LocalDate.now()));
 	let hideCompleted = $state(false);
 	let pauseTaskId = $state<number | null>(null);
+	let showPauseByTagModal = $state(false);
 
 	const tasks = $derived(timeTravel ? await getAllTasksForDate({ now }) : await getAllTasks());
+	const tags = $derived(await getAllTags());
 
 	async function onTaskCheckboxChange(id: number, taskCompleted: boolean) {
 		if (taskCompleted) {
@@ -68,6 +73,10 @@
 </button>
 <button class="btn btn-primary btn-soft mb-4" onclick={() => (hideCompleted = !hideCompleted)}>
 	{#if hideCompleted}<Eye />{:else}<EyeOff />{/if}
+</button>
+<button class="btn btn-warning mb-4" onclick={() => (showPauseByTagModal = true)}>
+	<CirclePause class="size-4" />
+	Alle mit Tag pausieren
 </button>
 
 {#if dev}
@@ -228,6 +237,51 @@
 
 			<div class="modal-action">
 				<button type="button" class="btn" onclick={() => (pauseTaskId = null)}>
+					Abbrechen
+				</button>
+				<button type="submit" class="btn btn-warning">Pausieren</button>
+			</div>
+		</form>
+	</div>
+</dialog>
+
+<dialog
+	class="modal"
+	onclick={(e) => {
+		if (e.target === e.currentTarget) showPauseByTagModal = false;
+	}}
+	onsubmit={() => (showPauseByTagModal = false)}
+	open={showPauseByTagModal}
+>
+	<div class="modal-box">
+		<h3 class="font-bold text-lg">Alle Aufgaben mit Tag pausieren</h3>
+		<p class="py-4">Wähle einen Tag und die Anzahl der Tage zum Pausieren aus.</p>
+		<form
+			{...pauseTasksByTag}
+			oninput={() => pauseTasksByTag.validate()}
+			class="flex flex-col gap-4"
+		>
+			<FormRowSelect
+				id="tagName"
+				label="Tag"
+				field={pauseTasksByTag.fields.tagName}
+				options={tags.reduce(
+					(acc, tag) => {
+						acc[tag.name] = tag.name;
+						return acc;
+					},
+					{} as Record<string, string>,
+				)}
+			/>
+
+			<FormRowNumber
+				id="countDays"
+				label="Anzahl Tage"
+				field={pauseTasksByTag.fields.countDays}
+			/>
+
+			<div class="modal-action">
+				<button type="button" class="btn" onclick={() => (showPauseByTagModal = false)}>
 					Abbrechen
 				</button>
 				<button type="submit" class="btn btn-warning">Pausieren</button>
