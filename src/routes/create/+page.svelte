@@ -43,6 +43,12 @@
 			fromDueDate: 'Wiederholung ab Fälligkeitsdatum',
 		}}
 	/>
+	<FormRow
+		type="text"
+		id="tags"
+		label="Tags (optional, durch Komma getrennt)"
+		field={createTask.fields.tags}
+	/>
 
 	<button class="btn btn-primary">Erstellen</button>
 </form>

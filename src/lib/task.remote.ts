@@ -28,11 +28,24 @@ export const createTask = form(
 		intervalCount: v.pipe(v.number(), v.integer(), v.minValue(1)),
 		intervalType: v.picklist(['days', 'months']),
 		repeatMode: v.picklist(['fromDueDate', 'fromCompletionDate']),
+		tags: v.optional(
+			v.pipe(
+				v.string(),
+				v.transform((s) =>
+					s
+						? s
+								.split(',')
+								.map((t) => t.trim())
+								.filter((t) => t.length > 0)
+						: [],
+				),
+			),
+		),
 	}),
 	async (data) => {
 		const user = await getUser();
 
-		await db.insert(table.tasks).values({
+		const result = await db.insert(table.tasks).values({
 			userId: user.id,
 			title: data.title,
 			nextDueDate: data.nextDueDate,
@@ -41,6 +54,37 @@ export const createTask = form(
 			repeatMode: data.repeatMode,
 			archived: false,
 		});
+
+		const taskId = Number(result.lastInsertRowid);
+
+		if (data.tags && data.tags.length > 0) {
+			const uniqueTags = [...new Set(data.tags)];
+
+			for (const tagName of uniqueTags) {
+				let tag = await db.query.tags.findFirst({
+					where: and(eq(table.tags.name, tagName), eq(table.tags.userId, user.id)),
+				});
+
+				if (!tag) {
+					const tagResult = await db.insert(table.tags).values({
+						userId: user.id,
+						name: tagName,
+					});
+					tag = {
+						id: Number(tagResult.lastInsertRowid),
+						userId: user.id,
+						name: tagName,
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					};
+				}
+
+				await db.insert(table.taskTags).values({
+					taskId,
+					tagId: tag.id,
+				});
+			}
+		}
 
 		redirect(303, '/');
 	},
@@ -58,6 +102,19 @@ export const editTask = form(
 		intervalCount: v.pipe(v.number(), v.integer(), v.minValue(1)),
 		intervalType: v.picklist(['days', 'months']),
 		repeatMode: v.picklist(['fromDueDate', 'fromCompletionDate']),
+		tags: v.optional(
+			v.pipe(
+				v.string(),
+				v.transform((s) =>
+					s
+						? s
+								.split(',')
+								.map((t) => t.trim())
+								.filter((t) => t.length > 0)
+						: [],
+				),
+			),
+		),
 	}),
 	async (data) => {
 		const user = await getUser();
@@ -74,6 +131,38 @@ export const editTask = form(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		if (result.rowsAffected === 0) error(400);
+
+		// Update tags
+		await db.delete(table.taskTags).where(eq(table.taskTags.taskId, data.id));
+
+		if (data.tags && data.tags.length > 0) {
+			const uniqueTags = [...new Set(data.tags)];
+
+			for (const tagName of uniqueTags) {
+				let tag = await db.query.tags.findFirst({
+					where: and(eq(table.tags.name, tagName), eq(table.tags.userId, user.id)),
+				});
+
+				if (!tag) {
+					const tagResult = await db.insert(table.tags).values({
+						userId: user.id,
+						name: tagName,
+					});
+					tag = {
+						id: Number(tagResult.lastInsertRowid),
+						userId: user.id,
+						name: tagName,
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					};
+				}
+
+				await db.insert(table.taskTags).values({
+					taskId: data.id,
+					tagId: tag.id,
+				});
+			}
+		}
 
 		await getTaskById(data.id).refresh();
 
@@ -224,11 +313,21 @@ export const getTaskById = query(v.pipe(v.number(), v.integer()), async (id) => 
 
 	const task = await db.query.tasks.findFirst({
 		where: and(eq(table.tasks.id, id), eq(table.tasks.userId, user.id)),
+		with: {
+			taskTags: {
+				with: {
+					tag: true,
+				},
+			},
+		},
 	});
 
 	if (!task) error(404);
 
-	return task;
+	return {
+		...task,
+		tags: task.taskTags.map((tt) => tt.tag.name),
+	};
 });
 
 export const getAllTasks = query(async () => {
@@ -254,6 +353,7 @@ type TaskItem = {
 	intervalCount: number;
 	intervalType: 'days' | 'months';
 	completed: boolean;
+	tags: string[];
 };
 
 export const getAllTasksForDate = query(
@@ -268,6 +368,11 @@ export const getAllTasksForDate = query(
 			with: {
 				tasksCompleted: {
 					where: eq(table.tasksCompleted.completionDate, data.now),
+				},
+				taskTags: {
+					with: {
+						tag: true,
+					},
 				},
 			},
 		});
@@ -302,6 +407,7 @@ export const getAllTasksForDate = query(
 				intervalCount: t.intervalCount,
 				intervalType: t.intervalType,
 				completed: t.tasksCompleted.length > 0 && t.nextDueDate.isAfter(data.now),
+				tags: t.taskTags.map((tt) => tt.tag.name),
 			}))
 			.reduce(
 				(agg, current) => {

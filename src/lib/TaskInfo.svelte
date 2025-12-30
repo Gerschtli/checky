@@ -11,6 +11,7 @@
 			nextDueDate: LocalDate;
 			intervalCount: number;
 			intervalType: 'days' | 'months';
+			tags?: string[];
 		};
 	}
 
@@ -74,4 +75,11 @@
 			Fällig in {dueInDays}&nbsp;Tagen
 		{/if}
 	</div>
+
+	{#if task.tags && task.tags.length > 0}
+		<div class="mx-2">•</div>
+		<div class="text-xs text-base-content/50">
+			{task.tags.join(', ')}
+		</div>
+	{/if}
 </div>

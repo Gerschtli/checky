@@ -61,6 +61,7 @@ export const tasks = sqliteTable('tasks', {
 
 export const tasksRelations = relations(tasks, ({ many }) => ({
 	tasksCompleted: many(tasksCompleted),
+	taskTags: many(taskTags),
 }));
 
 export const tasksCompleted = sqliteTable(
@@ -90,6 +91,49 @@ export const tasksCompletedRelations = relations(tasksCompleted, ({ one }) => ({
 	task: one(tasks, {
 		fields: [tasksCompleted.taskId],
 		references: [tasks.id],
+	}),
+}));
+
+export const tags = sqliteTable(
+	'tags',
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		userId: text()
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		name: text().notNull(),
+		...auditColumns,
+	},
+	(table) => [uniqueIndex('tags_idx_user_id_name').on(table.userId, table.name)],
+);
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+	taskTags: many(taskTags),
+}));
+
+export const taskTags = sqliteTable(
+	'task_tags',
+	{
+		id: integer().primaryKey({ autoIncrement: true }),
+		taskId: integer()
+			.notNull()
+			.references(() => tasks.id, { onDelete: 'cascade' }),
+		tagId: integer()
+			.notNull()
+			.references(() => tags.id, { onDelete: 'cascade' }),
+		...auditColumns,
+	},
+	(table) => [uniqueIndex('task_tags_idx_task_id_tag_id').on(table.taskId, table.tagId)],
+);
+
+export const taskTagsRelations = relations(taskTags, ({ one }) => ({
+	task: one(tasks, {
+		fields: [taskTags.taskId],
+		references: [tasks.id],
+	}),
+	tag: one(tags, {
+		fields: [taskTags.tagId],
+		references: [tags.id],
 	}),
 }));
 

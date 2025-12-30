@@ -54,6 +54,13 @@
 			fromDueDate: 'Wiederholung ab Fälligkeitsdatum',
 		}}
 	/>
+	<FormRow
+		type="text"
+		id="tags"
+		label="Tags (optional, durch Komma getrennt)"
+		field={editTask.fields.tags}
+		default={task.tags.join(', ')}
+	/>
 
 	<button class="btn btn-primary">Speichern</button>
 </form>

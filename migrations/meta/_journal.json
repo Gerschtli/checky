@@ -22,6 +22,13 @@
       "when": 1759258723993,
       "tag": "0002_add-interval-type",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1767118507093,
+      "tag": "0003_add-tags",
+      "breakpoints": true
     }
   ]
 }
