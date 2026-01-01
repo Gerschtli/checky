@@ -20,7 +20,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: nixbuild/nix-quick-install-action@v34
 
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@v6
@@ -65,7 +65,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: nixbuild/nix-quick-install-action@v34
 
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@v6
@@ -93,7 +93,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: nixbuild/nix-quick-install-action@v34
 
       - name: Restore and save Nix store
         uses: nix-community/cache-nix-action@v6
