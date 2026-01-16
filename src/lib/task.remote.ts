@@ -168,6 +168,7 @@ export const editTask = form(
 		await cleanupOrphanedTags();
 
 		await getTaskById(data.id).refresh();
+		await getAllTasks().refresh();
 
 		redirect(303, '/');
 	},
@@ -200,9 +201,9 @@ export const completeTask = command(
 			})
 			.where(eq(table.tasks.id, data.id));
 
-		await getTaskById(data.id).refresh();
+		// await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
-		await getAllTasksForDate({ now: data.completionDate }).refresh();
+		// await getAllTasksForDate({ now: data.completionDate }).refresh();
 	},
 );
 
@@ -258,9 +259,9 @@ export const uncompleteTask = command(
 			})
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
-		await getTaskById(data.id).refresh();
+		// await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
-		await getAllTasksForDate({ now: data.completionDate }).refresh();
+		// await getAllTasksForDate({ now: data.completionDate }).refresh();
 	},
 );
 
@@ -279,7 +280,7 @@ export const archiveTask = form(
 			})
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
-		await getTaskById(data.id).refresh();
+		// await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
 	},
 );
@@ -306,7 +307,7 @@ export const pauseTask = form(
 			})
 			.where(eq(table.tasks.id, data.id));
 
-		await getTaskById(data.id).refresh();
+		// await getTaskById(data.id).refresh();
 		await getAllTasks().refresh();
 	},
 );
@@ -527,7 +528,7 @@ export const reactivateTask = form(
 			.where(and(eq(table.tasks.id, data.id), eq(table.tasks.userId, user.id)));
 
 		await getArchivedTasks().refresh();
-		await getAllTasks().refresh();
+		// await getAllTasks().refresh();
 	},
 );
 
@@ -557,7 +558,7 @@ export const deleteTask = form(
 		await cleanupOrphanedTags();
 
 		await getArchivedTasks().refresh();
-		await getAllTasks().refresh();
+		// await getAllTasks().refresh();
 	},
 );
 
