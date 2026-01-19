@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/state';
-
 	import TaskInfo from '$lib/TaskInfo.svelte';
 	import { LocalDate } from '$lib/dates';
 	import { getTaskById, getTaskCompletions } from '$lib/task.remote';
 
-	const paramId = $derived(page.params.id!);
-	const taskId = $derived(parseInt(paramId));
+	const { params } = $props();
+
+	const taskId = $derived(parseInt(params.id));
 	const task = $derived(await getTaskById(taskId));
 	const completions = $derived(await getTaskCompletions(taskId));
 

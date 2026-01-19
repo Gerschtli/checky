@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { page } from '$app/state';
-
 	import FormRow from '$lib/FormRow.svelte';
 	import FormRowNumber from '$lib/FormRowNumber.svelte';
 	import FormRowSelect from '$lib/FormRowSelect.svelte';
 	import { editTask, getTaskById } from '$lib/task.remote';
 
-	const task = $derived(await getTaskById(parseInt(page.params.id!)));
+	const { params } = $props();
+
+	const task = $derived(await getTaskById(parseInt(params.id)));
 </script>
 
 <h1 class="text-xl font-bold">Aufgabe bearbeiten</h1>
