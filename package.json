@@ -49,7 +49,7 @@
 		"vitest": "^4.0.16"
 	},
 	"dependencies": {
-		"@libsql/client": "^0.15.15",
+		"@libsql/client": "^0.17.0",
 		"@node-rs/argon2": "^2.0.2",
 		"@sveltejs/adapter-vercel": "^6.2.0",
 		"@valibot/i18n": "^1.0.0",
