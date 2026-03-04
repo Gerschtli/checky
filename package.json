@@ -21,7 +21,7 @@
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.0",
-		"@eslint/js": "^9.39.2",
+		"@eslint/js": "^10.0.0",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"@sveltejs/kit": "^2.49.2",
@@ -33,7 +33,7 @@
 		"daisyui": "^5.5.14",
 		"drizzle-kit": "^0.31.8",
 		"drizzle-orm": "^0.45.1",
-		"eslint": "^9.39.2",
+		"eslint": "^10.0.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.13.1",
 		"globals": "^17.0.0",
