@@ -8,7 +8,7 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			runtime: 'nodejs22.x',
+			runtime: 'nodejs24.x',
 			regions: ['fra1'],
 		}),
 		experimental: {

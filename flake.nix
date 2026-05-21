@@ -7,9 +7,9 @@
     let
       forEachSystem = nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-linux" ];
 
-      pkgsFor = forEachSystem (system: import nixpkgs { inherit system; });
+      pkgsFor = forEachSystem (system: nixpkgs.legacyPackages.${system});
 
-      nodejsFor = forEachSystem (system: pkgsFor.${system}.nodejs_22);
+      nodejsFor = forEachSystem (system: pkgsFor.${system}.nodejs_24);
     in
     {
       devShells = forEachSystem
@@ -23,10 +23,10 @@
               {
                 packages = [
                   nodejs
-                  nodejs.pkgs.pnpm
+                  pkgs.pnpm
                   pkgs.sqlite-interactive
-                  pkgs.turso-cli
-                  pkgs.nodePackages.vercel
+                  # pkgs.turso-cli
+                  # pkgs.nodePackages.vercel
                 ];
               };
           });
