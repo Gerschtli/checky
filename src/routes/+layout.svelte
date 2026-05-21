@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LogOut, Plus } from 'lucide-svelte';
+	import { LogOut, Plus } from '@lucide/svelte';
 
 	import { onNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';

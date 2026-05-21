@@ -6,7 +6,7 @@
 		Pencil,
 		RotateCcw,
 		Trash2,
-	} from 'lucide-svelte';
+	} from '@lucide/svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 
 	import { resolve } from '$app/paths';

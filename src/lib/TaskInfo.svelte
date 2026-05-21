@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Calendar, Repeat } from 'lucide-svelte';
+	import { Calendar, Repeat } from '@lucide/svelte';
 
 	import { LocalDate } from './dates';
 

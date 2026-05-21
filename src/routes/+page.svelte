@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Archive, CircleCheck, CirclePause, Eye, EyeOff, TriangleAlert } from 'lucide-svelte';
+	import { Archive, CircleCheck, CirclePause, Eye, EyeOff, TriangleAlert } from '@lucide/svelte';
 
 	import { dev } from '$app/environment';
 	import { resolve } from '$app/paths';

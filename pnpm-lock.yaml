@@ -11,6 +11,9 @@ importers:
       '@libsql/client':
         specifier: ^0.17.0
         version: 0.17.2
+      '@lucide/svelte':
+        specifier: ^1.16.0
+        version: 1.16.0(svelte@5.46.1)
       '@node-rs/argon2':
         specifier: ^2.0.2
         version: 2.0.2
@@ -20,9 +23,6 @@ importers:
       '@valibot/i18n':
         specifier: ^1.0.0
         version: 1.1.0(valibot@1.3.1(typescript@6.0.3))
-      lucide-svelte:
-        specifier: ^1.0.0
-        version: 1.0.1(svelte@5.46.1)
       valibot:
         specifier: ^1.2.0
         version: 1.3.1(typescript@6.0.3)
@@ -752,6 +752,11 @@ packages:
     resolution: {integrity: sha512-4/0CvEdhi6+KjMxMaVbFM2n2Z44escBRoEYpR+gZg64DdetzGnYm8mcNLcoySaDJZNaBd6wz5DNdgRmcI4hXcg==}
     cpu: [x64]
     os: [win32]
+
+  '@lucide/svelte@1.16.0':
+    resolution: {integrity: sha512-AvvPJnaWxeiNkAljI5MsSEc84yHPLMaWQIAJOcbX7k9au/f9ITS7cxTTQiautDiOFKVOXiYdZ+d6mtl88J+Kbg==}
+    peerDependencies:
+      svelte: ^5
 
   '@mapbox/node-pre-gyp@2.0.3':
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
@@ -1853,12 +1858,6 @@ packages:
     resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
     engines: {node: 20 || >=22}
 
-  lucide-svelte@1.0.1:
-    resolution: {integrity: sha512-WvzZgk0pqzgda+AErLvgWxHkfg/+GgUwqKMRHvzt0IqyMdmyEDzDCk3Z+Wo/3y753oIgx8u9Q4eUbWkghFa8Jg==}
-    deprecated: Package deprecated. Please use @lucide/svelte instead.
-    peerDependencies:
-      svelte: ^3 || ^4 || ^5.0.0-next.42
-
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -2811,6 +2810,10 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.5.29':
     optional: true
+
+  '@lucide/svelte@1.16.0(svelte@5.46.1)':
+    dependencies:
+      svelte: 5.46.1
 
   '@mapbox/node-pre-gyp@2.0.3':
     dependencies:
@@ -3804,10 +3807,6 @@ snapshots:
   lodash-es@4.17.23: {}
 
   lru-cache@11.2.7: {}
-
-  lucide-svelte@1.0.1(svelte@5.46.1):
-    dependencies:
-      svelte: 5.46.1
 
   magic-string@0.30.21:
     dependencies:

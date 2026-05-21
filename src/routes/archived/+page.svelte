@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Archive, ArrowLeft } from 'lucide-svelte';
+	import { Archive, ArrowLeft } from '@lucide/svelte';
 
 	import { resolve } from '$app/paths';
 
