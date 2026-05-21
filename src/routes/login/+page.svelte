@@ -1,20 +1,29 @@
 <script lang="ts">
 	import FormRow from '$lib/FormRow.svelte';
-	import { login, register } from '$lib/auth.remote';
+	import { loginOrRegister } from '$lib/auth.remote';
 </script>
 
 <h1 class="text-xl font-bold">Login</h1>
 
-<form {...login} class="flex flex-col gap-2">
-	{#each login.fields.issues() as issue, i (i)}
+<form {...loginOrRegister} class="flex flex-col gap-2">
+	{#each loginOrRegister.fields.issues() as issue, i (i)}
 		<small class="text-error">
 			{issue.message}
 		</small>
 	{/each}
 
-	<FormRow type="text" id="username" label="Username" field={login.fields.username} />
-	<FormRow type="password" id="password" label="Passwort" field={login.fields._password} />
+	<FormRow type="text" id="username" label="Username" field={loginOrRegister.fields.username} />
+	<FormRow
+		type="password"
+		id="password"
+		label="Passwort"
+		field={loginOrRegister.fields._password}
+	/>
 
-	<button class="btn btn-primary">Login</button>
-	<button class="btn btn-secondary" {...register.buttonProps}>Registrieren</button>
+	<button class="btn btn-primary" {...loginOrRegister.fields.action.as('submit', 'login')}>
+		Login
+	</button>
+	<button class="btn btn-secondary" {...loginOrRegister.fields.action.as('submit', 'register')}>
+		Registrieren
+	</button>
 </form>

@@ -40,56 +40,43 @@ export const getUserOptional = query(async () => {
 	return locals.user;
 });
 
-export const login = form(
+export const loginOrRegister = form(
 	v.object({
 		username: v.pipe(v.string(), v.minLength(3)),
 		_password: v.pipe(v.string(), v.minLength(6)),
+		action: v.picklist(['login', 'register']),
 	}),
-	async ({ username, _password: password }) => {
-		const results = await db
-			.select()
-			.from(table.users)
-			.where(eq(table.users.username, username));
+	async ({ username, _password: password, action }) => {
+		let userId: string;
+		if (action === 'login') {
+			const results = await db
+				.select()
+				.from(table.users)
+				.where(eq(table.users.username, username));
 
-		const existingUser = results.at(0);
-		if (!existingUser) {
-			invalid('Incorrect username or password');
-		}
+			const existingUser = results.at(0);
+			if (!existingUser) invalid('Incorrect username or password');
 
-		const validPassword = verify(existingUser.passwordHash, password);
-		if (!validPassword) {
-			invalid('Incorrect username or password');
+			const validPassword = verify(existingUser.passwordHash, password);
+			if (!validPassword) invalid('Incorrect username or password');
+
+			userId = existingUser.id;
+		} else if (action === 'register') {
+			userId = generateUserId();
+			const passwordHash = hash(password);
+
+			try {
+				await db.insert(table.users).values({ id: userId, username, passwordHash });
+			} catch {
+				error(500, { message: 'An error has occurred' });
+			}
+		} else {
+			error(400, { message: 'Invalid action' });
 		}
 
 		const sessionToken = auth.generateSessionToken();
-		const session = await auth.createSession(sessionToken, existingUser.id);
+		const session = await auth.createSession(sessionToken, userId);
 		auth.setSessionTokenCookie(getRequestEvent(), sessionToken, session.expiresAt);
-
-		await getUser().refresh();
-		await getUserOptional().refresh();
-
-		redirect(302, resolve('/'));
-	},
-);
-
-export const register = form(
-	v.object({
-		username: v.pipe(v.string(), v.minLength(3)),
-		_password: v.pipe(v.string(), v.minLength(6)),
-	}),
-	async ({ username, _password: password }) => {
-		const userId = generateUserId();
-		const passwordHash = hash(password);
-
-		try {
-			await db.insert(table.users).values({ id: userId, username, passwordHash });
-
-			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, userId);
-			auth.setSessionTokenCookie(getRequestEvent(), sessionToken, session.expiresAt);
-		} catch {
-			error(500, { message: 'An error has occurred' });
-		}
 
 		await getUser().refresh();
 		await getUserOptional().refresh();
