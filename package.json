@@ -28,7 +28,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tailwindcss/vite": "^4.1.18",
 		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@types/better-sqlite3": "^7.6.12",
+		"@types/better-sqlite3": "^9.0.0",
 		"@types/node": "^24.12.4",
 		"daisyui": "^5.5.14",
 		"drizzle-kit": "^0.31.8",
