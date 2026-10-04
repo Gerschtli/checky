@@ -68,10 +68,10 @@ export const loginOrRegister = form(
 			try {
 				await db.insert(table.users).values({ id: userId, username, passwordHash });
 			} catch {
-				error(500, { message: 'An error has occurred' });
+				error(500, 'An error has occurred');
 			}
 		} else {
-			error(400, { message: 'Invalid action' });
+			error(400, 'Invalid action');
 		}
 
 		const sessionToken = auth.generateSessionToken();
