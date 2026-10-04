@@ -54,7 +54,7 @@
 		"@libsql/client": "^0.18.0",
 		"@lucide/svelte": "^1.16.0",
 		"@node-rs/argon2": "^2.0.2",
-		"@sveltejs/adapter-vercel": "^6.2.0",
+		"@sveltejs/adapter-vercel": "^7.0.0",
 		"@valibot/i18n": "^1.0.0",
 		"valibot": "^1.2.0"
 	},
