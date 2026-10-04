@@ -1,5 +1,5 @@
-import { type Handle, redirect } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import { redirect } from '@sveltejs/kit';
+import { type Handle, sequence } from '@sveltejs/kit/hooks';
 
 import { resolve as resolveUrl } from '$app/paths';
 

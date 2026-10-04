@@ -1,4 +1,4 @@
-import type { Transport } from '@sveltejs/kit';
+import type { Transport } from '@sveltejs/kit/hooks';
 import '@valibot/i18n/de';
 import * as v from 'valibot';
 

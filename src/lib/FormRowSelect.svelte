@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends string">
-	import type { RemoteFormField } from '@sveltejs/kit';
+	import type { RemoteFormField } from '$app/server';
 
 	interface Props {
 		default?: T;
