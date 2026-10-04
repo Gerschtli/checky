@@ -33,7 +33,7 @@ const handleAuthorization: Handle = async ({ event, resolve }) => {
 	}
 
 	if (event.route.id !== '/login' && !event.locals.session) {
-		redirect(302, resolveUrl('/login'));
+		redirect(302, resolveUrl('login'));
 	}
 
 	return resolve(event);

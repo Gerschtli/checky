@@ -23,13 +23,13 @@ export const logout = form(async () => {
 	await getUser().refresh();
 	await getUserOptional().refresh();
 
-	redirect(302, resolve('/login'));
+	redirect(302, resolve('login'));
 });
 
 export const getUser = query(async () => {
 	const { locals } = getRequestEvent();
 
-	if (!locals.user) redirect(302, resolve('/login'));
+	if (!locals.user) redirect(302, resolve('login'));
 
 	return locals.user;
 });

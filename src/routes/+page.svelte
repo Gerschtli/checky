@@ -66,10 +66,7 @@
 	<CirclePause class="size-4" />
 	Alle mit Tag pausieren
 </button>
-<a href={resolve('/archived')} class="btn btn-secondary mb-4">
-	<Archive class="size-4" />
-	Archiv
-</a>
+<a href={resolve('archived')} class="btn btn-secondary mb-4"><Archive class="size-4" />Archiv</a>
 
 {#if dev}
 	<button class="btn btn-warning mb-4" onclick={() => initData()}>Testdaten generieren</button>

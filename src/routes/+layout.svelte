@@ -37,11 +37,7 @@
 		</div>
 
 		<div class="flex gap-4">
-			<a
-				href={resolve('/create')}
-				class="btn btn-primary"
-				aria-label="Neue Aufgabe erstellen"
-			>
+			<a href={resolve('create')} class="btn btn-primary" aria-label="Neue Aufgabe erstellen">
 				<Plus />
 			</a>
 
