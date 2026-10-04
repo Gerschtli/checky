@@ -10,7 +10,7 @@
 		"prettier-plugin-tailwindcss",
 		"@trivago/prettier-plugin-sort-imports"
 	],
-	"importOrder": ["^\\$(app|env)/", "^\\$lib/server", "^\\$", "^\\.\\./", "^\\./", "\\.css$"],
+	"importOrder": ["^\\$app/", "^#lib/server", "^(\\$|#)", "^\\.\\./", "^\\./", "\\.css$"],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true,
 	"overrides": [

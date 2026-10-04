@@ -1,6 +1,6 @@
 <script lang="ts">
-	import FormRow from '$lib/FormRow.svelte';
-	import { loginOrRegister } from '$lib/auth.remote';
+	import FormRow from '#lib/FormRow.svelte';
+	import { loginOrRegister } from '#lib/auth.remote.js';
 </script>
 
 <h1 class="text-xl font-bold">Login</h1>

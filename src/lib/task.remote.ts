@@ -4,7 +4,7 @@ import * as v from 'valibot';
 
 import { command, form, query } from '$app/server';
 
-import * as table from '$lib/server/db/schema';
+import * as table from '#lib/server/db/schema.js';
 
 import { getUser } from './auth.remote';
 import { LocalDate } from './dates';

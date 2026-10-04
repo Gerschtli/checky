@@ -1,9 +1,9 @@
 <script lang="ts">
-	import FormRow from '$lib/FormRow.svelte';
-	import FormRowNumber from '$lib/FormRowNumber.svelte';
-	import FormRowSelect from '$lib/FormRowSelect.svelte';
-	import { LocalDate } from '$lib/dates';
-	import { createTask } from '$lib/task.remote';
+	import FormRow from '#lib/FormRow.svelte';
+	import FormRowNumber from '#lib/FormRowNumber.svelte';
+	import FormRowSelect from '#lib/FormRowSelect.svelte';
+	import { LocalDate } from '#lib/dates.js';
+	import { createTask } from '#lib/task.remote.js';
 </script>
 
 <h1 class="text-xl font-bold">Aufgabe erstellen</h1>

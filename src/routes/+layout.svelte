@@ -4,9 +4,9 @@
 	import { onNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
-	import favicon from '$lib/assets/favicon.svg';
-	import { getUserOptional, logout } from '$lib/auth.remote';
-	import { LocalDate } from '$lib/dates';
+	import favicon from '#lib/assets/favicon.svg';
+	import { getUserOptional, logout } from '#lib/auth.remote.js';
+	import { LocalDate } from '#lib/dates.js';
 
 	import '../app.css';
 

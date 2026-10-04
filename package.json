@@ -57,5 +57,9 @@
 		"@sveltejs/adapter-vercel": "^6.2.0",
 		"@valibot/i18n": "^1.0.0",
 		"valibot": "^1.2.0"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
 	}
 }

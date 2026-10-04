@@ -3,10 +3,10 @@
 
 	import { resolve } from '$app/paths';
 
-	import EmptyState from '$lib/EmptyState.svelte';
-	import TaskCard from '$lib/TaskCard.svelte';
-	import { LocalDate } from '$lib/dates';
-	import { getArchivedTasks } from '$lib/task.remote';
+	import EmptyState from '#lib/EmptyState.svelte';
+	import TaskCard from '#lib/TaskCard.svelte';
+	import { LocalDate } from '#lib/dates.js';
+	import { getArchivedTasks } from '#lib/task.remote.js';
 
 	const tasks = $derived(await getArchivedTasks());
 	const now = LocalDate.now();

@@ -4,12 +4,12 @@
 	import { dev } from '$app/env';
 	import { resolve } from '$app/paths';
 
-	import EmptyState from '$lib/EmptyState.svelte';
-	import FormRowNumber from '$lib/FormRowNumber.svelte';
-	import FormRowSelect from '$lib/FormRowSelect.svelte';
-	import TaskCard from '$lib/TaskCard.svelte';
-	import { LocalDate } from '$lib/dates';
-	import { initData } from '$lib/init.remote';
+	import EmptyState from '#lib/EmptyState.svelte';
+	import FormRowNumber from '#lib/FormRowNumber.svelte';
+	import FormRowSelect from '#lib/FormRowSelect.svelte';
+	import TaskCard from '#lib/TaskCard.svelte';
+	import { LocalDate } from '#lib/dates.js';
+	import { initData } from '#lib/init.remote.js';
 	import {
 		completeTask,
 		getAllTags,
@@ -18,7 +18,7 @@
 		pauseTask,
 		pauseTasksByTag,
 		uncompleteTask,
-	} from '$lib/task.remote';
+	} from '#lib/task.remote.js';
 
 	let now = $state(LocalDate.now());
 	const timeTravel = $derived(!now.equals(LocalDate.now()));

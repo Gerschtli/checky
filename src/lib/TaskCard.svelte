@@ -11,9 +11,9 @@
 
 	import { resolve } from '$app/paths';
 
-	import TaskInfo from '$lib/TaskInfo.svelte';
-	import { LocalDate } from '$lib/dates';
-	import { archiveTask, deleteTask, reactivateTask } from '$lib/task.remote';
+	import TaskInfo from '#lib/TaskInfo.svelte';
+	import { LocalDate } from '#lib/dates.js';
+	import { archiveTask, deleteTask, reactivateTask } from '#lib/task.remote.js';
 
 	interface Props {
 		now: LocalDate;

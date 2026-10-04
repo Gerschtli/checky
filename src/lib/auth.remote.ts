@@ -6,9 +6,9 @@ import * as v from 'valibot';
 import { resolve } from '$app/paths';
 import { form, getRequestEvent, query } from '$app/server';
 
-import * as auth from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import * as auth from '#lib/server/auth.js';
+import { db } from '#lib/server/db/index.js';
+import * as table from '#lib/server/db/schema.js';
 
 export const logout = form(async () => {
 	const event = getRequestEvent();

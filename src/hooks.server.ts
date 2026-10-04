@@ -3,7 +3,7 @@ import { type Handle, sequence } from '@sveltejs/kit/hooks';
 
 import { resolve as resolveUrl } from '$app/paths';
 
-import * as auth from '$lib/server/auth';
+import * as auth from '#lib/server/auth.js';
 
 const handleAuthentication: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(auth.sessionCookieName);

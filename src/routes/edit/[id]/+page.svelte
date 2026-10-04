@@ -1,8 +1,8 @@
 <script lang="ts">
-	import FormRow from '$lib/FormRow.svelte';
-	import FormRowNumber from '$lib/FormRowNumber.svelte';
-	import FormRowSelect from '$lib/FormRowSelect.svelte';
-	import { editTask, getTaskById } from '$lib/task.remote';
+	import FormRow from '#lib/FormRow.svelte';
+	import FormRowNumber from '#lib/FormRowNumber.svelte';
+	import FormRowSelect from '#lib/FormRowSelect.svelte';
+	import { editTask, getTaskById } from '#lib/task.remote.js';
 
 	const { params } = $props();
 

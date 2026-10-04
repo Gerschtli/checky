@@ -1,7 +1,7 @@
 <script lang="ts">
-	import TaskInfo from '$lib/TaskInfo.svelte';
-	import { LocalDate } from '$lib/dates';
-	import { getTaskById, getTaskCompletions } from '$lib/task.remote';
+	import TaskInfo from '#lib/TaskInfo.svelte';
+	import { LocalDate } from '#lib/dates.js';
+	import { getTaskById, getTaskCompletions } from '#lib/task.remote.js';
 
 	const { params } = $props();
 
