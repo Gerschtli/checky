@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/libsql';
 
-import { TURSO_AUTH_TOKEN, TURSO_CONNECTION_URL } from '$env/static/private';
+import { TURSO_AUTH_TOKEN, TURSO_CONNECTION_URL } from '$app/env/private';
 
 import * as schema from './schema';
 
