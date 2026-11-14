@@ -9,7 +9,7 @@
 
       pkgsFor = forEachSystem (system: nixpkgs.legacyPackages.${system});
 
-      nodejsFor = forEachSystem (system: pkgsFor.${system}.nodejs_24);
+      nodejsFor = forEachSystem (system: pkgsFor.${system}.nodejs_26);
     in
     {
       devShells = forEachSystem

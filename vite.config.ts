@@ -12,7 +12,7 @@ export default defineConfig({
 			// for more information about preprocessors
 			preprocess: vitePreprocess(),
 			compilerOptions: { experimental: { async: true } },
-			adapter: adapter({ runtime: 'nodejs24.x', regions: ['fra1'] }),
+			adapter: adapter({ runtime: 'nodejs26.x', regions: ['fra1'] }),
 			experimental: { remoteFunctions: true },
 		}),
 	],
